@@ -18,138 +18,177 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    ));
+
+    _controller.forward();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 800) {
+          return _buildWebLayout();
+        } else {
+          return _buildMobileLayout();
+        }
+      },
+    );
+  }
+
+  Widget _buildMobileLayout() {
     return SafeArea(
       child: Scaffold(
         body: Column(
           children: [
             Expanded(
-                flex: 5,
-                child: Container(
-                  padding: EdgeInsets.only(top: 30),
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      Text(
-                        "Selamat Datang di E-Assesment\nKader Posyandu",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(color: Colors.black87),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Kabupaten Temanggung",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: Colors.black87),
-                      ),
-                    ],
-                  ),
-                )),
+              flex: 5,
+              child: _buildHeader(),
+            ),
             Expanded(
               flex: 5,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.green400.color,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(18),
-                    topRight: Radius.circular(18),
-                  ),
+              child: _buildLoginForm(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebLayout() {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          width: 500,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+          ),
+          child: _buildLoginForm(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        padding: const EdgeInsets.only(top: 30),
+        width: double.infinity,
+        color: Colors.white,
+        
+        child: Column(
+          children: [
+            Hero(
+              tag: 'app_logo',
+              child: Image.asset('assets/logo.jpeg', height: 100),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Selamat Datang di E-Assesment\nKader Posyandu",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.black87),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Kabupaten Temanggung",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return SlideTransition(
+      position: _slideAnimation,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: AppColors.green400.color,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 30),
+            CustomTextfield(title: "Email", textInputType: TextInputType.emailAddress, controller: _emailController),
+            const SizedBox(height: 20),
+            CustomTextfield(title: "Password", textInputType: TextInputType.visiblePassword, obsecureText: true, controller: _passwordController),
+            const SizedBox(height: 25),
+            Consumer2<UserProvider, PreferencesProvider>(
+              builder: (context, userProvider, prefProvider, child) {
+                if (userProvider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return CustomButton(
+                  title: "Masuk",
+                  onTap: () async {
+                    final data = UserModel(
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
+                    final result = await userProvider.loginUser(data);
+                    if (result.users != null && result.users!.name != null) {
+                      await prefProvider.saveUserToken(result.token!);
+                      await prefProvider.saveUsername(result.users!.name!);
+                      context.go('/');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(userProvider.message!)));
+                    }
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Belum punya akun? ", style: Theme.of(context).textTheme.bodyMedium),
+                InkWell(
+                  onTap: () => context.goNamed('register'),
+                  child: Text("Daftar disini", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.green700.color)),
                 ),
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 30),
-                    CustomTextfield(
-                      title: "Email",
-                      textInputType: TextInputType.emailAddress,
-                      controller: _emailController,
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextfield(
-                      title: "Password",
-                      textInputType: TextInputType.visiblePassword,
-                      obsecureText: true,
-                      controller: _passwordController,
-                    ),
-                    const SizedBox(height: 25),
-                    Consumer2<UserProvider, PreferencesProvider>(
-                      builder: (context, userProvider, prefProvider, child) {
-                        if (userProvider.isLoading) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        return CustomButton(
-                          title: "Masuk",
-                          onTap: () async {
-                            final data = UserModel(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            );
-
-                            final result = await userProvider.loginUser(data);
-
-                            if (result.users != null &&
-                                result.users!.name != null) {
-                              await prefProvider.saveUserToken(result.token!);
-                              await prefProvider
-                                  .saveUsername(result.users!.name!);
-
-                              context.go('/');
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(userProvider.message!)),
-                              );
-                            }
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Belum punya akun? ",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        InkWell(
-                            onTap: () {
-                              print("KEPENCET");
-                              context.goNamed('register');
-                            },
-                            child: Text(
-                              "Daftar disini",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(color: AppColors.green700.color),
-                            )),
-                      ],
-                    )
-                  ],
-                ),
-              ),
+              ],
             ),
           ],
         ),

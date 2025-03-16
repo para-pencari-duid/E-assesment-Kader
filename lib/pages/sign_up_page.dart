@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:e_assesment_kader_app/data/models/puskesmas_model.dart';
 import 'package:e_assesment_kader_app/data/models/user_model.dart';
 import 'package:e_assesment_kader_app/pages/login_page.dart';
@@ -7,8 +9,6 @@ import 'package:e_assesment_kader_app/static/puskesmas_result_state.dart';
 import 'package:e_assesment_kader_app/widgets/custom_button.dart';
 import 'package:e_assesment_kader_app/widgets/custom_dropdown.dart';
 import 'package:e_assesment_kader_app/widgets/custom_textfield.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -22,17 +22,12 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () {
-        context.read<PuskesmasProvider>().fetchPuskesmasList();
-      },
-    );
+    Future.microtask(() => context.read<PuskesmasProvider>().fetchPuskesmasList());
   }
 
   @override
@@ -47,105 +42,101 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Daftar Akun Penilai"),
+      appBar: AppBar(title: const Text("Daftar Akun Penilai")),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth > 600 ? 500 : double.infinity),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  elevation: constraints.maxWidth > 600 ? 4 : 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _buildForm(),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        children: [
-          CustomTextfield(
-            title: "Nama Lengkap",
-            controller: _fullNameController,
-          ),
-          CustomTextfield(
-            title: "Email",
-            controller: _emailController,
-          ),
-          CustomTextfield(
-            title: "Password",
-            controller: _passwordController,
-            obsecureText: true,
-          ),
-          CustomTextfield(
-            title: "Konfirmasi Password",
-            controller: _confirmPasswordController,
-            obsecureText: true,
-          ),
-          Consumer<PuskesmasProvider>(
-            builder: (context, provider, child) {
-              return switch (provider.resultState) {
-                PuskesmasListLoadingState() => Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                PuskesmasListLoadedState(data: var puskesmasList) =>
-                  CustomDropdown<PuskesmasModel>(
-                    title: "Puskesmas",
-                    items: puskesmasList,
-                    selectedValue: _selectedPuskesmas,
-                    itemLabel: (puskesmas) => puskesmas.nama!,
-                    onChanged: (selected) {
-                      setState(() {
-                        _selectedPuskesmas = selected;
-                      });
-                    },
-                  ),
-                PuskesmasListErrorState(error: var message) => Center(
-                    child: Text(message),
-                  ),
-                _ => const SizedBox(),
-              };
-            },
-          ),
-          const SizedBox(height: 20),
-          Consumer<UserProvider>(
-            builder: (context, userProvider, child) {
-              return Column(
-                children: [
-                  if (userProvider.isLoading) CircularProgressIndicator(),
-                  CustomButton(
-                    title: "Daftar",
-                    onTap: () async {
-                      final data = UserModel(
-                        puskesmasId: _selectedPuskesmas?.id.toString(),
-                        name: _fullNameController.text,
-                        email: _emailController.text,
-                        password: _passwordController.text,
-                        passwordConfirmation: _confirmPasswordController.text,
-                      );
+    );
+  }
 
-                      if (_passwordController.text !=
-                          _confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Password is not matches")));
-                      }
-
-                      bool success = await userProvider.registerUser(data);
-
-                      if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(userProvider.message!)),
-                        );
-
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginPage(),
-                          ),
-                          (route) => false,
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(userProvider.message!)),
-                        );
-                      }
-                    },
-                  ),
-                ],
+  Widget _buildForm() {
+    return ListView(
+      shrinkWrap: true,
+      
+      children: [
+        CustomTextfield(title: "Nama Lengkap", controller: _fullNameController),
+        CustomTextfield(title: "Email", controller: _emailController),
+        CustomTextfield(title: "Password", controller: _passwordController, obsecureText: true),
+        CustomTextfield(title: "Konfirmasi Password", controller: _confirmPasswordController, obsecureText: true),
+        Consumer<PuskesmasProvider>(
+          builder: (context, provider, child) {
+            if (provider.resultState is PuskesmasListLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (provider.resultState is PuskesmasListLoadedState) {
+              final puskesmasList = (provider.resultState as PuskesmasListLoadedState).data;
+              return CustomDropdown<PuskesmasModel>(
+                title: "Puskesmas",
+                items: puskesmasList,
+                selectedValue: _selectedPuskesmas,
+                itemLabel: (puskesmas) => puskesmas.nama!,
+                onChanged: (selected) => setState(() => _selectedPuskesmas = selected),
               );
-            },
-          ),
-        ],
-      ),
+            } else if (provider.resultState is PuskesmasListErrorState) {
+              return Center(child: Text((provider.resultState as PuskesmasListErrorState).error));
+            }
+            return const SizedBox();
+          },
+        ),
+        const SizedBox(height: 20),
+        Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            return Column(
+              children: [
+                if (userProvider.isLoading) const CircularProgressIndicator(),
+                CustomButton(
+                  title: "Daftar",
+                  onTap: () async {
+                    if (_passwordController.text != _confirmPasswordController.text) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Password tidak cocok")),
+                      );
+                      return;
+                    }
+                    
+                    final data = UserModel(
+                      puskesmasId: _selectedPuskesmas?.id.toString(),
+                      name: _fullNameController.text,
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                      passwordConfirmation: _confirmPasswordController.text,
+                    );
+
+                    bool success = await userProvider.registerUser(data);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(userProvider.message ?? "Terjadi kesalahan")),
+                    );
+
+                    if (success) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        (route) => false,
+                      );
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 }

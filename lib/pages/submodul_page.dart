@@ -43,53 +43,84 @@ class _SubmodulPageState extends State<SubmodulPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Daftar Submodul"),
+        title: Text(
+          "Daftar Submodul",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade700,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children: [
-          Consumer2<SubmodulProvider, ResultKaderProvider>(
-            builder: (context, provider, resultProvider, child) {
-              if (provider.resultState is SubmodulListLoadingState) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue.shade400, Colors.blue.shade700],
+          ),
+        ),
+        child: Consumer2<SubmodulProvider, ResultKaderProvider>(
+          builder: (context, provider, resultProvider, child) {
+            if (provider.resultState is SubmodulListLoadingState) {
+              return Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              );
+            }
 
-              if (provider.resultState is SubmodulListErrorState) {
-                return Center(
-                  child: Text(provider.message!),
-                );
-              }
+            if (provider.resultState is SubmodulListErrorState) {
+              return Center(
+                child: Text(
+                  provider.message!,
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
 
-              final submodulList = provider.subModules;
+            final submodulList = provider.subModules;
 
-              return ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: submodulList?.length,
-                itemBuilder: (context, index) {
-                  final submodul = submodulList?[index];
-                  final rProvider = context.watch<ResultKaderProvider>();
+            return ListView.builder(
+              physics: BouncingScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: submodulList?.length,
+              itemBuilder: (context, index) {
+                final submodul = submodulList?[index];
+                final rProvider = context.watch<ResultKaderProvider>();
 
-                  final dataKeterampilan =
-                      rProvider.getDataKeterampilan(submodul?.nama ?? "");
+                final dataKeterampilan =
+                    rProvider.getDataKeterampilan(submodul?.nama ?? "");
 
-                  final keterampilan = rProvider
-                      .getKeterampilanSudahTerisi(submodul?.nama ?? "");
+                final keterampilan = rProvider
+                    .getKeterampilanSudahTerisi(submodul?.nama ?? "");
 
-                  return SubmodulItem(
+                return AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: SubmodulItem(
                     index: index + 1,
                     kaderId: widget.kaderId,
                     data: submodul!,
                     dataKeterampilan: dataKeterampilan,
                     keterampilan: keterampilan,
-                  );
-                },
-              );
-            },
-          ),
-        ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -159,12 +190,20 @@ class SubmodulItem extends StatelessWidget {
                             kaderId: kaderId, submodulId: data.id!),
                       ));
                 },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
+              color: isDisabled ? Colors.grey.shade200 : Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.grey300.color),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -180,8 +219,6 @@ class SubmodulItem extends StatelessWidget {
                     children: [
                       Text(
                         "Submodul $index",
-                        // maxLines: 2,
-                        // overflow: TextOverflow.ellipsis,
                         style: Theme.of(context)
                             .textTheme
                             .titleSmall!
@@ -190,8 +227,6 @@ class SubmodulItem extends StatelessWidget {
                       const SizedBox(height: 5),
                       Text(
                         data.nama ?? "-",
-                        // maxLines: 2,
-                        // overflow: TextOverflow.ellipsis,
                         style: Theme.of(context)
                             .textTheme
                             .titleSmall!
@@ -200,11 +235,11 @@ class SubmodulItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                //todo: indikator centang
                 Icon(
-                  Icons.check,
+                  Icons.check_circle,
                   color: checklistColor,
-                )
+                  size: 24,
+                ),
               ],
             ),
           ),

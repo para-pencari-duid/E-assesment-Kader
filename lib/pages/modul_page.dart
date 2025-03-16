@@ -39,63 +39,88 @@ class _ModulPageState extends State<ModulPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Daftar Modul"),
+        title: Text(
+          "Daftar Modul",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade700,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Pilih modul untuk assesment",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue.shade400, Colors.blue.shade700],
+          ),
+        ),
+        child: Column(
+          children: [
+            const Text(
+              "Pilih modul untuk assesment",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              const SizedBox(height: 16),
-              Consumer<ModulProvider>(
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<ModulProvider>(
                 builder: (context, provider, child) {
                   if (provider.resultState is ModulListLoadingState) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(color: Colors.white),
                     );
                   }
 
                   if (provider.resultState is ModulListErrorState) {
-                    return Text(
-                        "Error terjadi. Harap coba beberapa saat lagi.");
+                    return Center(
+                      child: Text(
+                        "Error terjadi. Harap coba beberapa saat lagi.",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
                   }
 
                   final modulList = provider.modules;
 
-                  return Expanded(
-                    child: Wrap(
-                      spacing: 16, // Jarak antar item horizontal
-                      runSpacing: 16, // Jarak antar item vertikal
-                      alignment: WrapAlignment.center,
-                      children: modulList?.map((modul) {
-                            return ModulItem(
-                                kaderId: widget.kaderId, data: modul);
-                          }).toList() ??
-                          [],
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: _calculateCrossAxisCount(context),
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.2,
                     ),
+                    itemCount: modulList?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      final modul = modulList![index];
+                      return ModulItem(kaderId: widget.kaderId, data: modul);
+                    },
                   );
                 },
-              )
-              // Expanded(
-              //   child: Wrap(
-              //     spacing: 16, // Jarak antar item horizontal
-              //     runSpacing: 16, // Jarak antar item vertikal
-              //     alignment: WrapAlignment.center,
-              //     children: modulList.map((modul) {
-              //       return ModulItem(title: modul);
-              //     }).toList(),
-              //   ),
-              // ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  int _calculateCrossAxisCount(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width > 1200) {
+      return 4;
+    } else if (width > 800) {
+      return 3;
+    } else if (width > 600) {
+      return 2;
+    } else {
+      return 1;
+    }
   }
 }
 
@@ -107,26 +132,30 @@ class ModulItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SubmodulPage(
-                kaderId: kaderId,
-                modulId: data.id!,
-              ),
-            ));
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubmodulPage(
+              kaderId: kaderId,
+              modulId: data.id!,
+            ),
+          ),
+        );
       },
-      child: Container(
-        width: 150,
-        height: 130,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
         decoration: BoxDecoration(
-          color: Colors.primaries[data.hashCode % Colors.primaries.length]
-              .shade200, // Warna random berdasarkan hash
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
           ],
         ),
         child: Column(
@@ -134,16 +163,19 @@ class ModulItem extends StatelessWidget {
           children: [
             Image.asset(
               "assets/img_mother.png",
-              width: 50,
-              height: 50,
+              width: 60,
+              height: 60,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
                 data.nama ?? "-",
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
           ],

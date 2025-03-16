@@ -41,42 +41,77 @@ class _SubmodulPageState extends State<QuestionListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Daftar Pertanyaan"),
+        title: Text(
+          "Daftar Pertanyaan",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.blue.shade700,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children: [
-          Consumer<QuestionProvider>(
-            builder: (context, provider, child) {
-              if (provider.resultState is QuestionListLoadingState) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (provider.resultState is QuestionListErrorState) {
-                return Center(
-                  child: Text(provider.message!),
-                );
-              }
-
-              final questionList = provider.questiones;
-              return ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: questionList?.length,
-                itemBuilder: (context, index) {
-                  final question = questionList?[index];
-
-                  return QuestionItem(index: index + 1, data: question!);
-                },
-              );
-            },
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue.shade400, Colors.blue.shade700],
           ),
-          const SizedBox(height: 15),
-          //todo: Button Submit
-          _buildSubmitButton(context),
-        ],
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: Consumer<QuestionProvider>(
+                builder: (context, provider, child) {
+                  if (provider.resultState is QuestionListLoadingState) {
+                    return Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  }
+
+                  if (provider.resultState is QuestionListErrorState) {
+                    return Center(
+                      child: Text(
+                        provider.message!,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+
+                  final questionList = provider.questiones;
+                  return ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: questionList?.length,
+                    itemBuilder: (context, index) {
+                      final question = questionList?[index];
+                      return AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: QuestionItem(index: index + 1, data: question!),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildSubmitButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -107,12 +142,13 @@ class _SubmodulPageState extends State<QuestionListPage> {
                 SnackBar(content: Text("Jawaban berhasil dikirim!")),
               );
 
-              //navigasikan kembali halaman modul
+              // Navigasikan kembali ke halaman modul
               Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ModulPage(kaderId: widget.kaderId),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ModulPage(kaderId: widget.kaderId),
+                ),
+              );
             },
           ),
         );
@@ -133,55 +169,48 @@ class QuestionItem extends StatelessWidget {
 
     // Cek apakah jawaban sudah ada di provider
     int? selectedValue = answerProvider.answers
-        .firstWhere((a) => a.pertanyaanId == data.id,
-            orElse: () => Penilaian(pertanyaanId: data.id, nilai: -1))
+        .firstWhere(
+          (a) => a.pertanyaanId == data.id,
+          orElse: () => Penilaian(pertanyaanId: data.id, nilai: -1),
+        )
         .nilai;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                "assets/img_exam.png",
-                width: 50,
-                height: 50,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Image.asset(
+              "assets/img_exam.png",
+              width: 50,
+              height: 50,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Pertanyaan $index",
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    data.pertanyaan ?? "-",
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Pertanyaan $index",
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall!
-                          .copyWith(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      data.pertanyaan ?? "-",
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall!
-                          .copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 7),
-          _buildRadioButtons(context, data.id!, selectedValue, answerProvider),
-        ],
-      ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildRadioButtons(context, data.id!, selectedValue, answerProvider),
+      ],
     );
   }
 

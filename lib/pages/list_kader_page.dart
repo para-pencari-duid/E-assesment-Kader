@@ -17,8 +17,6 @@ class ListKaderPage extends StatefulWidget {
 }
 
 class _ListKaderPageState extends State<ListKaderPage> {
-  // final ScrollController scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
@@ -26,15 +24,6 @@ class _ListKaderPageState extends State<ListKaderPage> {
     final prefProvider = context.read<PreferencesProvider>();
     final kaderProvider = context.read<KaderProvider>();
 
-    // scrollController.addListener(() {
-    //   if (scrollController.position.pixels >=
-    //       scrollController.position.maxScrollExtent) {
-    //     if (kaderProvider.pageItems != null &&
-    //         kaderProvider.resultState is! KaderListLoadingState) {
-    //       kaderProvider.fetchKaderList(prefProvider.userToken!);
-    //     }
-    //   }
-    // });
     Future.microtask(
       () {
         if (prefProvider.userToken != null) {
@@ -51,106 +40,121 @@ class _ListKaderPageState extends State<ListKaderPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Daftar Kader"),
-          // centerTitle: true,
+          title: Text(
+            "Daftar Kader",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.blue.shade700,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
         ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          children: [
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                    child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Masukkan Nama Kader",
-                    prefixIcon: Icon(Icons.search),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          width: 1,
-                          color: AppColors.grey300.color), //<-- SEE HERE
-                      borderRadius: BorderRadius.circular(7.0),
+        body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Masukkan Nama Kader",
+                          prefixIcon: Icon(Icons.search, color: AppColors.green400.color),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        ),
+                      ),
                     ),
                   ),
-                )),
-                GestureDetector(
-                  onTap: () {
-                    // context.goNamed("register-kader");
-
-                    Navigator.push(
+                  const SizedBox(width: 16),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => SignUpKaderPage(),
-                        ));
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 10),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.green400.color,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Icon(Icons.add),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 40),
-            Consumer<KaderProvider>(
-              builder: (context, provider, child) {
-                final state = provider.resultState;
-
-                if (state is KaderListLoadingState) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (provider.resultState is KaderListErrorState) {
-                  return Text("Error: ${provider.message}");
-                } else {
-                  final kaderList = provider.kaders;
-
-                  return ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: kaderList?.length,
-                    itemBuilder: (context, index) {
-                      final kader = kaderList?[index];
-                      return KaderItem(user: kader!);
+                        ),
+                      );
                     },
-                  );
-                }
-              },
-            ),
-            // Consumer<KaderProvider>(
-            //   builder: (context, provider, child) {
-            //     final state = provider.resultState;
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: AppColors.green400.color,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Expanded(
+                child: Consumer<KaderProvider>(
+                  builder: (context, provider, child) {
+                    final state = provider.resultState;
 
-            //     if (state is KaderListLoadingState && provider.pageItems == 1) {
-            //       return Center(child: CircularProgressIndicator());
-            //     } else if (provider.resultState is KaderListErrorState) {
-            //       return Text("Error: ${provider.message}");
-            //     } else {
-            //       final kaderList = provider.kaders;
+                    if (state is KaderListLoadingState) {
+                      return Center(child: CircularProgressIndicator(color: Colors.white));
+                    } else if (provider.resultState is KaderListErrorState) {
+                      return Center(
+                        child: Text(
+                          "Error: ${provider.message}",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    } else {
+                      final kaderList = provider.kaders;
 
-            //       return ListView.builder(
-            //         physics: NeverScrollableScrollPhysics(),
-            //         shrinkWrap: true,
-            //         controller: scrollController,
-            //         itemCount: kaderList!.length +
-            //             (provider.pageItems != null ? 1 : 0),
-            //         itemBuilder: (context, index) {
-            //           if (index >= kaderList.length) {
-            //             return Center(
-            //                 child:
-            //                     CircularProgressIndicator()); // Indikator loading untuk pagination
-            //           }
-
-            //           final kader = kaderList[index];
-            //           return KaderItem(user: kader);
-            //         },
-            //       );
-            //     }
-            //   },
-            // ),
-          ],
+                      return ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: kaderList?.length,
+                        itemBuilder: (context, index) {
+                          final kader = kaderList?[index];
+                          return AnimatedOpacity(
+                            opacity: 1,
+                            duration: Duration(milliseconds: 500),
+                            child: KaderItem(user: kader!),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

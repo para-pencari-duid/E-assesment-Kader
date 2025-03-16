@@ -17,6 +17,7 @@ class ResultKaderResponse {
   final String? namaKader;
   final String? kelamin;
   final String? message;
+  final String? klasifikasi;
   final PuskesmasModel? puskesmas;
   final List<Penilai>? detailPenilai;
   final List<HasilPenilaian>? hasilPenilaian;
@@ -29,6 +30,7 @@ class ResultKaderResponse {
     this.puskesmas,
     this.detailPenilai,
     this.hasilPenilaian,
+    this.klasifikasi,
   });
 
   factory ResultKaderResponse.fromJson(Map<String, dynamic> json) =>
@@ -36,6 +38,7 @@ class ResultKaderResponse {
         kaderId: json["kader_id"],
         namaKader: json["nama_kader"],
         kelamin: json["kelamin"],
+        klasifikasi: json["klasifikasi"],
         message: json["message"],
         puskesmas: json["puskesmas"] == null
             ? null
@@ -54,6 +57,7 @@ class ResultKaderResponse {
         "kader_id": kaderId,
         "nama_kader": namaKader,
         "kelamin": kelamin,
+        "klasifikasi": klasifikasi,
         "puskesmas": puskesmas?.toJson(),
         "hasil_penilaian": hasilPenilaian == null
             ? []

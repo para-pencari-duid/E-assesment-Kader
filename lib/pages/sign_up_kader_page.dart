@@ -1,0 +1,216 @@
+import 'package:e_assesment_kader_app/data/models/puskesmas_model.dart';
+import 'package:e_assesment_kader_app/data/models/user_model.dart';
+import 'package:e_assesment_kader_app/pages/list_kader_page.dart';
+import 'package:e_assesment_kader_app/providers/kader_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/preferences_provider.dart';
+import '../providers/puskesmas_provider.dart';
+import '../static/puskesmas_result_state.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_dropdown.dart';
+import '../widgets/custom_textfield.dart';
+
+class SignUpKaderPage extends StatefulWidget {
+  const SignUpKaderPage({super.key});
+
+  @override
+  State<SignUpKaderPage> createState() => _SignUpKaderPageState();
+}
+
+class _SignUpKaderPageState extends State<SignUpKaderPage> {
+  PuskesmasModel? _selectedPuskesmas;
+  String? _selectedGender;
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _nikController = TextEditingController();
+  final TextEditingController _umurController = TextEditingController();
+  final TextEditingController _posyanduController = TextEditingController();
+  final TextEditingController _pendikanTerakhirController =
+      TextEditingController();
+  final TextEditingController _lamaJadiKaderController =
+      TextEditingController();
+  final TextEditingController _pekerjaanNonKaderController =
+      TextEditingController();
+  String? _selectedInsentif; // "Ya" atau "Tidak"
+  TextEditingController _insentifController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () {
+        context.read<PuskesmasProvider>().fetchPuskesmasList();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _fullNameController.dispose();
+    _nikController.dispose();
+    _umurController.dispose();
+    _posyanduController.dispose();
+    _pendikanTerakhirController.dispose();
+    _lamaJadiKaderController.dispose();
+    _pekerjaanNonKaderController.dispose();
+    _insentifController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text("Daftar Akun Kader"),
+          ),
+          body: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            children: [
+              CustomTextfield(
+                title: "Nama Lengkap",
+                textInputType: TextInputType.name,
+                controller: _fullNameController,
+              ),
+              Consumer<PuskesmasProvider>(
+                builder: (context, provider, child) {
+                  return switch (provider.resultState) {
+                    PuskesmasListLoadingState() =>
+                      Center(child: CircularProgressIndicator()),
+                    PuskesmasListLoadedState(data: var puskesmasList) =>
+                      CustomDropdown<PuskesmasModel>(
+                        title: "Puskesmas",
+                        items: puskesmasList,
+                        selectedValue: _selectedPuskesmas,
+                        itemLabel: (puskesmas) => puskesmas.nama!,
+                        onChanged: (selected) {
+                          setState(() {
+                            _selectedPuskesmas = selected;
+                          });
+                        },
+                      ),
+                    PuskesmasListErrorState(error: var message) => Center(
+                        child: Text(message),
+                      ),
+                    _ => const SizedBox(),
+                  };
+                },
+              ),
+              CustomDropdown<String>(
+                title: "Jenis Kelamin",
+                items: ["L", "P"], // List data gender
+                selectedValue:
+                    _selectedGender, // Variabel state untuk menyimpan nilai yang dipilih
+                itemLabel: (value) =>
+                    value == "L" ? "Laki-laki" : "Perempuan", // Mapping label
+                onChanged: (value) {
+                  setState(() {
+                    _selectedGender =
+                        value; // Menyimpan nilai yang dipilih ke state
+                  });
+                },
+              ),
+              CustomTextfield(
+                title: "NIK",
+                textInputType: TextInputType.number,
+                controller: _nikController,
+              ),
+              CustomTextfield(
+                title: "Umur",
+                textInputType: TextInputType.number,
+                controller: _umurController,
+              ),
+              CustomTextfield(
+                title: "Posyandu",
+                textInputType: TextInputType.name,
+                controller: _posyanduController,
+              ),
+              CustomTextfield(
+                title: "Pendidikan Terakhir",
+                textInputType: TextInputType.name,
+                controller: _pendikanTerakhirController,
+              ),
+              CustomTextfield(
+                title: "Lama Menjadi Kader",
+                textInputType: TextInputType.name,
+                controller: _lamaJadiKaderController,
+              ),
+              CustomTextfield(
+                title: "Pekerjaan Selain Kader",
+                textInputType: TextInputType.name,
+                controller: _pekerjaanNonKaderController,
+              ),
+              CustomDropdown<String>(
+                title: "Apakah kader dapat insentif?",
+                items: ["Ya", "Tidak"], // Pilihan dropdown
+                selectedValue: _selectedInsentif,
+                itemLabel: (value) =>
+                    value, // Langsung gunakan value sebagai label
+                onChanged: (value) {
+                  setState(() {
+                    _selectedInsentif = value;
+                  });
+                },
+              ),
+              if (_selectedInsentif == "Ya") ...[
+                CustomTextfield(
+                  title: "Nominal Insentif",
+                  textInputType: TextInputType.number,
+                  controller: _insentifController,
+                ),
+              ],
+              Consumer<KaderProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isLoading == true) {
+                    return CircularProgressIndicator();
+                  }
+                  return CustomButton(
+                      title: "Daftar Kader",
+                      onTap: () async {
+                        final prefProvider =
+                            context.read<PreferencesProvider>();
+
+                        final request = UserModel(
+                          puskesmasId: _selectedPuskesmas?.id.toString(),
+                          name: _fullNameController.text,
+                          nik: _nikController.text,
+                          kelamin: _selectedGender,
+                          lamaJadiKader: _lamaJadiKaderController.text,
+                          umur: _umurController.text.toString(),
+                          posyandu: _posyanduController.text,
+                          pekerjaanSelainKader:
+                              _pekerjaanNonKaderController.text,
+                          pendidikanTerakhir: _pendikanTerakhirController.text,
+                          dapatInsentifDariDesa: _selectedInsentif,
+                          insentifPerTahun: _insentifController.text,
+                        );
+
+                        final result = await provider.createKader(
+                            request, prefProvider.userToken!);
+
+                        if (result.kader != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(result.message!)),
+                          );
+
+                          // context.goNamed("kader");
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ListKaderPage(),
+                              ));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(result.error!)),
+                          );
+                        }
+                      });
+                },
+              )
+            ],
+          )),
+    );
+  }
+}

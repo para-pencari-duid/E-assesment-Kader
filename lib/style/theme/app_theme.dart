@@ -21,6 +21,7 @@ class AppTheme {
       labelLarge: AppTextStyles.labelLarge,
       labelMedium: AppTextStyles.labelMedium,
       labelSmall: AppTextStyles.labelSmall,
+      
     );
   }
 
@@ -41,4 +42,6 @@ class AppTheme {
       useMaterial3: true,
     );
   }
+  
 }
+

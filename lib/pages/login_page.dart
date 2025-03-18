@@ -112,8 +112,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       child: Container(
         padding: const EdgeInsets.only(top: 30),
         width: double.infinity,
-        color: Colors.white,
-        
+        color: AppColors.green400.color, // Changed to a primary color
         child: Column(
           children: [
             Hero(
@@ -124,13 +123,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             Text(
               "Selamat Datang di E-Assesment\nKader Posyandu",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.black87),
+              style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Colors.white),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             Text(
               "Kabupaten Temanggung",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.black87),
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.white70),
             ),
           ],
         ),
@@ -142,18 +141,28 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     return SlideTransition(
       position: _slideAnimation,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         decoration: BoxDecoration(
-          color: AppColors.green400.color,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 30),
-            CustomTextfield(title: "Email", textInputType: TextInputType.emailAddress, controller: _emailController),
             const SizedBox(height: 20),
-            CustomTextfield(title: "Password", textInputType: TextInputType.visiblePassword, obsecureText: true, controller: _passwordController),
+            CustomTextfield(
+              title: "Email",
+              textInputType: TextInputType.emailAddress,
+              controller: _emailController,
+            ),
+            const SizedBox(height: 20),
+            CustomTextfield(
+              title: "Password",
+              textInputType: TextInputType.visiblePassword,
+              obsecureText: true,
+              controller: _passwordController,
+            ),
             const SizedBox(height: 25),
             Consumer2<UserProvider, PreferencesProvider>(
               builder: (context, userProvider, prefProvider, child) {
@@ -167,7 +176,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       email: _emailController.text,
                       password: _passwordController.text,
                     );
-                    final result = await userProvider.loginUser(data);
+                    final result = await userProvider.loginUser (data);
                     if (result.users != null && result.users!.name != null) {
                       await prefProvider.saveUserToken(result.token!);
                       await prefProvider.saveUsername(result.users!.name!);

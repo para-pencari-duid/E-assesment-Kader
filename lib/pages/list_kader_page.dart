@@ -39,7 +39,7 @@ class _ListKaderPageState extends State<ListKaderPage> {
       appBar: AppBar(
         title: const Text("Daftar Kader", style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: AppColors.blue300.color,
+        backgroundColor: Colors.blue.shade700,
         elevation: 2,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -49,7 +49,7 @@ class _ListKaderPageState extends State<ListKaderPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFFF5F5F5)],
+            colors: [Color.fromARGB(255, 255, 255, 255), Color(0xFFF5F5F5)],
           ),
         ),
         child: Column(

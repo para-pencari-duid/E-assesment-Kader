@@ -56,7 +56,7 @@ class _SubmodulPageState extends State<QuestionListPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade400, Colors.blue.shade700],
+            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
           ),
         ),
         child: Column(

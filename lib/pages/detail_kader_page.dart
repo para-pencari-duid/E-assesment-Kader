@@ -1,9 +1,7 @@
-import 'package:e_assesment_kader_app/providers/result_kader_provider.dart';
 import 'package:e_assesment_kader_app/static/result_kader_state.dart';
-import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../providers/result_kader_provider.dart';
 import '../providers/preferences_provider.dart';
 
 class DetailKaderPage extends StatefulWidget {
@@ -24,8 +22,6 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
 
       if (prefProvider.userToken != null && widget.kaderId.isNotEmpty) {
         provider.getResultKader(prefProvider.userToken!, widget.kaderId);
-      } else {
-        print("Token atau kaderId kosong, tidak memanggil API");
       }
     });
   }
@@ -34,229 +30,141 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Detail Kader",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Detail Kader", style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: Colors.teal,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
-          ),
-        ),
-        child: Consumer<ResultKaderProvider>(
-          builder: (context, provider, child) {
-            if (provider.resultState is ResultKaderLoadingState) {
-              return Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
-            } else if (provider.resultState is ResultKaderErrorState) {
-              return Center(
-                child: Text(
-                  provider.result!.message!,
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            } else {
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: 500),
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 4,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: provider.result?.kelamin == "L"
-                                  ? Image.asset(
-                                      "assets/img_male.png",
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.asset(
-                                      "assets/img_woman.png",
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
+      body: Consumer<ResultKaderProvider>(
+        builder: (context, provider, child) {
+          if (provider.resultState is ResultKaderLoadingState) {
+            return const Center(child: CircularProgressIndicator(color: Colors.teal));
+          } else if (provider.resultState is ResultKaderErrorState) {
+            return Center(
+              child: Text(provider.result!.message!,
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            );
+          } else {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.teal,
+                          child: ClipOval(
+                            child: provider.result?.kelamin == "L"
+                                ? Image.asset("assets/img_male.png", fit: BoxFit.cover)
+                                : Image.asset("assets/img_woman.png", fit: BoxFit.cover),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            provider.result?.namaKader ?? "Nama tidak tersedia",
-                            textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(provider.result?.namaKader ?? "Tidak tersedia",
                             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                  color: const Color.fromARGB(255, 0, 0, 0),
                                   fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Puskesmas-${provider.result?.puskesmas?.nama ?? "-"}",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: const Color.fromARGB(179, 0, 0, 0),
-                                ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Klasifikasi Kader-${provider.result?.klasifikasi ?? "-"}",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: const Color.fromARGB(179, 0, 0, 0),
-                                ),
-                          ),
-                        ],
-                      ),
+                                  color: Colors.teal.shade900,
+                                )),
+                        const SizedBox(height: 8),
+                        Text("Puskesmas-${provider.result?.puskesmas?.nama ?? "-"}",
+                            style: Theme.of(context).textTheme.titleMedium),
+                        const SizedBox(height: 8),
+                        Text("Klasifikasi-${provider.result?.klasifikasi ?? "-"}",
+                            style: Theme.of(context).textTheme.titleMedium),
+                      ],
                     ),
-                    const SizedBox(height: 32),
-                    Text(
-                      "Data Penilai",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...?provider.result?.detailPenilai?.map((penilai) =>
-                              Column(
+                  ),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle("Data Penilai"),
+                  _buildCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: provider.result?.detailPenilai?.map((penilai) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "Nama: ${penilai.name}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(fontWeight: FontWeight.bold),
-                                  ),const SizedBox(height: 8),
-                                  Text(
-                                    "Tipe: ${penilai.tipe}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Puskesmas: ${penilai.puskesmas}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium,
-                                  ),
-                                  const SizedBox(height: 16),
+                                  Text("Nama: ${penilai.name}", style: _boldTextStyle()),
+                                  Text("Tipe: ${penilai.tipe}"),
+                                  Text("Puskesmas: ${penilai.puskesmas}"),
                                 ],
-                              )),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Text(
-                      "Hasil Penilaian",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                    ...(provider.result?.hasilPenilaian ?? []).map((kompetensi) {
-                      return AnimatedContainer(
-                        duration: Duration(milliseconds: 500),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
                               ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Kompetensi: ${kompetensi.kompetensi}",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 16),
-                            ...(kompetensi.keterampilan ?? []).map((keterampilan) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "- ${keterampilan.namaKeterampilan}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
-                                      ),
-                                    ),
-                                    Text(
-                                      keterampilan.status!,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: keterampilan.status == "Lulus"
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                            );
+                          }).toList() ??
+                          [],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+_buildSectionTitle("Hasil Penilaian"),
+...?(provider.result?.hasilPenilaian?.map((kompetensi) {
+  return Column(
+    children: [
+      _buildCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Kompetensi: ${kompetensi.kompetensi}", style: _boldTextStyle()),
+            ...kompetensi.keterampilan!.map((keterampilan) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text("- ${keterampilan.namaKeterampilan}")),
+                    Chip(
+                      label: Text(keterampilan.status!),
+                      backgroundColor: keterampilan.status == "Lulus" ? Colors.green : Colors.red,
+                      labelStyle: const TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               );
-            }
-          },
+            }).toList(),
+          ],
         ),
       ),
+      const SizedBox(height: 16), // Tambahkan jarak antar card
+    ],
+  );
+}).toList() ?? []),
+
+                ],
+              ),
+            );
+          }
+        },
+      ),
     );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(title, style: _boldTextStyle().copyWith(fontSize: 18, color: Colors.teal.shade900)),
+    );
+  }
+
+  Widget _buildCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  TextStyle _boldTextStyle() {
+    return const TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   }
 }

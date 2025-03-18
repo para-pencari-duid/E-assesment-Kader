@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           width: 500,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 255, 255, 255),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
           ),

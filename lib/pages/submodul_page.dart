@@ -58,14 +58,14 @@ class _SubmodulPageState extends State<SubmodulPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade400, Colors.blue.shade700],
+            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
           ),
         ),
         child: Consumer2<SubmodulProvider, ResultKaderProvider>(
           builder: (context, provider, resultProvider, child) {
             if (provider.resultState is SubmodulListLoadingState) {
               return Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: const Color.fromARGB(255, 255, 55, 55)),
               );
             }
 
@@ -99,8 +99,9 @@ class _SubmodulPageState extends State<SubmodulPage> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color.fromARGB(255, 61, 194, 255),
                     borderRadius: BorderRadius.circular(12),
+                    
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12,

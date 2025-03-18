@@ -54,7 +54,7 @@ class _ModulPageState extends State<ModulPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade400, Colors.blue.shade700],
+            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
           ),
         ),
         child: Column(
@@ -64,7 +64,7 @@ class _ModulPageState extends State<ModulPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Color.fromARGB(255, 0, 0, 0),
               ),
             ),
             const SizedBox(height: 24),

@@ -24,137 +24,108 @@ class _ListKaderPageState extends State<ListKaderPage> {
     final prefProvider = context.read<PreferencesProvider>();
     final kaderProvider = context.read<KaderProvider>();
 
-    Future.microtask(
-      () {
-        if (prefProvider.userToken != null) {
-          kaderProvider.fetchKaderList(prefProvider.userToken!);
-        } else {
-          print("Token tidak ditemukan, tidak dapat mengambil data kader.");
-        }
-      },
-    );
+    Future.microtask(() {
+      if (prefProvider.userToken != null) {
+        kaderProvider.fetchKaderList(prefProvider.userToken!);
+      } else {
+        print("Token tidak ditemukan, tidak dapat mengambil data kader.");
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Daftar Kader",
-            style: TextStyle(color: Colors.white),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Daftar Kader", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: AppColors.blue300.color,
+        elevation: 2,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Color(0xFFF5F5F5)],
           ),
-          centerTitle: true,
-          backgroundColor: Colors.blue.shade700,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.white),
         ),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Cari Nama Kader",
+                      prefixIcon: Icon(Icons.search, color: AppColors.green400.color),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    backgroundColor: AppColors.green400.color,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SignUpKaderPage()),
+                    );
+                  },
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+              ],
             ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Masukkan Nama Kader",
-                          prefixIcon: Icon(Icons.search, color: AppColors.green400.color),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignUpKaderPage(),
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: AppColors.green400.color,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Expanded(
-                child: Consumer<KaderProvider>(
-                  builder: (context, provider, child) {
-                    final state = provider.resultState;
+            const SizedBox(height: 20),
+            Expanded(
+              child: Consumer<KaderProvider>(
+                builder: (context, provider, child) {
+                  final state = provider.resultState;
 
-                    if (state is KaderListLoadingState) {
-                      return Center(child: CircularProgressIndicator(color: Colors.white));
-                    } else if (provider.resultState is KaderListErrorState) {
-                      return Center(
-                        child: Text(
-                          "Error: ${provider.message}",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    } else {
-                      final kaderList = provider.kaders;
-
-                      return ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: kaderList?.length,
-                        itemBuilder: (context, index) {
-                          final kader = kaderList?[index];
-                          return AnimatedOpacity(
-                            opacity: 1,
-                            duration: Duration(milliseconds: 500),
-                            child: KaderItem(user: kader!),
-                          );
-                        },
+                  if (state is KaderListLoadingState) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is KaderListErrorState) {
+                    return Center(
+                      child: Text(
+                        "Error: ${provider.message}",
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  } else {
+                    final kaderList = provider.kaders;
+                    if (kaderList == null || kaderList.isEmpty) {
+                      return const Center(
+                        child: Text("Tidak ada data kader.", style: TextStyle(color: Colors.black54)),
                       );
                     }
-                  },
-                ),
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: kaderList.length,
+                      itemBuilder: (context, index) {
+                        final kader = kaderList[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: KaderItem(user: kader),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

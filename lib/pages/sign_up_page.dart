@@ -9,6 +9,7 @@ import 'package:e_assesment_kader_app/static/puskesmas_result_state.dart';
 import 'package:e_assesment_kader_app/widgets/custom_button.dart';
 import 'package:e_assesment_kader_app/widgets/custom_dropdown.dart';
 import 'package:e_assesment_kader_app/widgets/custom_textfield.dart';
+import 'package:e_assesment_kader_app/style/colors/app_colors.dart'; // Assuming you have a color file
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -42,7 +43,10 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Daftar Akun Penilai")),
+      appBar: AppBar(
+        title: const Text("Daftar Akun Penilai"),
+        backgroundColor: AppColors.green700.color, // Use your primary color
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Center(
@@ -52,6 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Card(
                   elevation: constraints.maxWidth > 600 ? 4 : 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: _buildForm(),
@@ -68,7 +73,6 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildForm() {
     return ListView(
       shrinkWrap: true,
-      
       children: [
         CustomTextfield(title: "Nama Lengkap", controller: _fullNameController),
         CustomTextfield(title: "Email", controller: _emailController),
@@ -117,7 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       passwordConfirmation: _confirmPasswordController.text,
                     );
 
-                    bool success = await userProvider.registerUser(data);
+                    bool success = await userProvider.registerUser (data);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(userProvider.message ?? "Terjadi kesalahan")),

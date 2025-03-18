@@ -60,98 +60,93 @@ class _HomePageState extends State<HomePage> {
                       "Selamat Datang,\n${provider.username}!",
                       style: Theme.of(context)
                           .textTheme
-                          .titleLarge!
+                          .headlineSmall!
                           .copyWith(fontWeight: FontWeight.w700),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 7),
                     Text(
                       "Puskemas -",
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ),
                 IconButton(
-                    onPressed: () async {
-                      final confirmLogout = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Konfirmasi Logout"),
-                            content: Text(
-                                "Apakah Anda yakin ingin keluar dari aplikasi?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // Batalkan logout
-                                },
-                                child: Text("Batal"),
+                  onPressed: () async {
+                    final confirmLogout = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Konfirmasi Logout"),
+                          content: Text(
+                              "Apakah Anda yakin ingin keluar dari aplikasi?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(false); // Batalkan logout
+                              },
+                              child: Text("Batal"),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.redAccent,
                               ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(true); // Konfirmasi logout
-                                },
-                                child: Text(
-                                  "Logout",
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(true); // Konfirmasi logout
+                              },
+                              child: Text(
+                                "Logout",
+                                style: Theme.of(context).textTheme.labelLarge,
                               ),
-                            ],
-                          );
-                        },
-                      );
+                            ),
+                          ],
+                        );
+                      },
+                    );
 
-                      if (confirmLogout == true) {
-                        final prefProvider =
-                            context.read<PreferencesProvider>();
-                        final userProvider = context.read<UserProvider>();
+                    if (confirmLogout == true) {
+                      final prefProvider =
+                          context.read<PreferencesProvider>();
+                      final userProvider = context.read<UserProvider>();
 
-                        await userProvider.logoutUser(prefProvider.userToken!);
-                        await prefProvider.removeUsername();
-                        await prefProvider.removeUserToken();
+                      await userProvider.logoutUser (prefProvider.userToken!);
+                      await prefProvider.removeUsername();
+                      await prefProvider.removeUserToken();
 
-                        context.go("/login");
-                      }
-                    },
-                    icon: Icon(
-                      Icons.logout,
-                      color: Colors.redAccent,
-                    )),
+                      context.go("/login");
+                    }
+                  },
+                  icon: Icon(
+                    Icons.logout,
+                    color: Colors.redAccent,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 65),
             Text("Menu",
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.w700,
                     )),
             const SizedBox(height: 15),
             Align(
-              alignment: Alignment.centerLeft, // Bisa disesuaikan
+              alignment: Alignment.centerLeft,
               child: GestureDetector(
                 onTap: () {
-                  print("BUTTON KEPENCET");
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => ListKaderPage(),
-                  //     ));
-
                   context.goNamed('kader');
                 },
                 child: Container(
-                  width: 169,
-                  height: 130,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  width: double.infinity,
+                  height: 150,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: AppColors.blue300.color,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
                         "assets/img_assesment.png",
@@ -161,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 15),
                       Text(
                         "Assesment Kader",
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
@@ -170,7 +165,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 25),
             Text("Laporan Data",
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.w700,
                     )),
             const SizedBox(height: 15),

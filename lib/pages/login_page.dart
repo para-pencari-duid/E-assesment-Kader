@@ -18,7 +18,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   late AnimationController _controller;
@@ -117,19 +118,25 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           children: [
             Hero(
               tag: 'app_logo',
-              child: Image.asset('assets/logo.jpeg', height: 100),
+              child: Image.asset('assets/images.jpeg', height: 100),
             ),
             const SizedBox(height: 10),
             Text(
               "Selamat Datang di E-Assesment\nKader Posyandu",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Colors.white),
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
+                  .copyWith(color: Colors.white),
             ),
             const SizedBox(height: 5),
             Text(
               "Kabupaten Temanggung",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.white70),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(color: Colors.white70),
             ),
           ],
         ),
@@ -176,13 +183,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       email: _emailController.text,
                       password: _passwordController.text,
                     );
-                    final result = await userProvider.loginUser (data);
+                    final result = await userProvider.loginUser(data);
                     if (result.users != null && result.users!.name != null) {
                       await prefProvider.saveUserToken(result.token!);
                       await prefProvider.saveUsername(result.users!.name!);
                       context.go('/');
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(userProvider.message!)));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(userProvider.message!)));
                     }
                   },
                 );
@@ -192,10 +200,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Belum punya akun? ", style: Theme.of(context).textTheme.bodyMedium),
+                Text("Belum punya akun? ",
+                    style: Theme.of(context).textTheme.bodyMedium),
                 InkWell(
                   onTap: () => context.goNamed('register'),
-                  child: Text("Daftar disini", style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.green700.color)),
+                  child: Text("Daftar disini",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: AppColors.green700.color)),
                 ),
               ],
             ),

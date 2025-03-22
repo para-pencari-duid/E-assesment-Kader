@@ -37,7 +37,8 @@ class _ListKaderPageState extends State<ListKaderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Daftar Kader", style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Daftar Kader", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.blue.shade700,
         elevation: 2,
@@ -60,14 +61,24 @@ class _ListKaderPageState extends State<ListKaderPage> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Cari Nama Kader",
-                      prefixIcon: Icon(Icons.search, color: AppColors.green400.color),
+                      prefixIcon:
+                          Icon(Icons.search, color: AppColors.green400.color),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide(
+                            color: AppColors.grey300.color,
+                            width: 1,
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide(
+                            color: AppColors.green400.color,
+                            width: 1,
+                          )),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
                     ),
                   ),
                 ),
@@ -75,13 +86,15 @@ class _ListKaderPageState extends State<ListKaderPage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     backgroundColor: AppColors.green400.color,
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignUpKaderPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpKaderPage()),
                     );
                   },
                   child: const Icon(Icons.add, color: Colors.white),
@@ -107,7 +120,8 @@ class _ListKaderPageState extends State<ListKaderPage> {
                     final kaderList = provider.kaders;
                     if (kaderList == null || kaderList.isEmpty) {
                       return const Center(
-                        child: Text("Tidak ada data kader.", style: TextStyle(color: Colors.black54)),
+                        child: Text("Tidak ada data kader.",
+                            style: TextStyle(color: Colors.black54)),
                       );
                     }
                     return ListView.builder(

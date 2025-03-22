@@ -34,7 +34,7 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
   final TextEditingController _pekerjaanNonKaderController =
       TextEditingController();
   String? _selectedInsentif; // "Ya" atau "Tidak"
-  TextEditingController _insentifController = TextEditingController();
+  final TextEditingController _insentifController = TextEditingController();
 
   @override
   void initState() {
@@ -102,8 +102,17 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                   children: [
                     CustomTextfield(
                       title: "Nama Lengkap",
-                      textInputType: TextInputType.name,
+                      textInputType: TextInputType.text,
                       controller: _fullNameController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Nama tidak boleh kosong";
+                        }
+                        if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                          return "Inputan hanya berisi huruf";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
                     Consumer<PuskesmasProvider>(
@@ -136,8 +145,9 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                       items: ["L", "P"], // List data gender
                       selectedValue:
                           _selectedGender, // Variabel state untuk menyimpan nilai yang dipilih
-                      itemLabel: (value) =>
-                          value == "L" ? "Laki-laki" : "Perempuan", // Mapping label
+                      itemLabel: (value) => value == "L"
+                          ? "Laki-laki"
+                          : "Perempuan", // Mapping label
                       onChanged: (value) {
                         setState(() {
                           _selectedGender =
@@ -171,8 +181,8 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                     ),
                     const SizedBox(height: 16),
                     CustomTextfield(
-                      title: "Lama Menjadi Kader",
-                      textInputType: TextInputType.name,
+                      title: "Lama Menjadi Kader (dalam tahun)",
+                      textInputType: TextInputType.number,
                       controller: _lamaJadiKaderController,
                     ),
                     const SizedBox(height: 16),
@@ -224,7 +234,8 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                               posyandu: _posyanduController.text,
                               pekerjaanSelainKader:
                                   _pekerjaanNonKaderController.text,
-                              pendidikanTerakhir: _pendikanTerakhirController.text,
+                              pendidikanTerakhir:
+                                  _pendikanTerakhirController.text,
                               dapatInsentifDariDesa: _selectedInsentif,
                               insentifPerTahun: _insentifController.text,
                             );

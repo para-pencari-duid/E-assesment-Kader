@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/preferences_provider.dart';
-import '../style/colors/app_colors.dart';
 
 class SubmodulPage extends StatefulWidget {
   final int kaderId;
@@ -58,14 +57,18 @@ class _SubmodulPageState extends State<SubmodulPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
+            colors: [
+              const Color.fromARGB(255, 255, 255, 255),
+              const Color.fromARGB(255, 255, 255, 255)
+            ],
           ),
         ),
         child: Consumer2<SubmodulProvider, ResultKaderProvider>(
           builder: (context, provider, resultProvider, child) {
             if (provider.resultState is SubmodulListLoadingState) {
               return Center(
-                child: CircularProgressIndicator(color: const Color.fromARGB(255, 255, 55, 55)),
+                child: CircularProgressIndicator(
+                    color: const Color.fromARGB(255, 255, 55, 55)),
               );
             }
 
@@ -91,8 +94,8 @@ class _SubmodulPageState extends State<SubmodulPage> {
                 final dataKeterampilan =
                     rProvider.getDataKeterampilan(submodul?.nama ?? "");
 
-                final keterampilan = rProvider
-                    .getKeterampilanSudahTerisi(submodul?.nama ?? "");
+                final keterampilan =
+                    rProvider.getKeterampilanSudahTerisi(submodul?.nama ?? "");
 
                 return AnimatedContainer(
                   duration: Duration(milliseconds: 300),
@@ -101,7 +104,6 @@ class _SubmodulPageState extends State<SubmodulPage> {
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 61, 194, 255),
                     borderRadius: BorderRadius.circular(12),
-                    
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12,

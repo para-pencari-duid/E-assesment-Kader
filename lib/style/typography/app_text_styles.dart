@@ -48,8 +48,8 @@ class AppTextStyles {
   static TextStyle headlineSmall = _commonStyle.copyWith(
     fontSize: 24,
     fontWeight: FontWeight.w400,
-    height: 1.0,
-    letterSpacing: -1,
+    height: 1.2,
+    letterSpacing: 1,
   );
 
   /// titleLarge Text Style

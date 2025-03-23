@@ -1,8 +1,8 @@
 import 'package:e_assesment_kader_app/data/models/pertanyaan_model.dart';
-import 'package:e_assesment_kader_app/pages/modul_page.dart';
 import 'package:e_assesment_kader_app/providers/pertanyaan_provider.dart';
 import 'package:e_assesment_kader_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../data/responses/answers_post_request.dart';
@@ -56,7 +56,10 @@ class _SubmodulPageState extends State<QuestionListPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
+            colors: [
+              const Color.fromARGB(255, 255, 255, 255),
+              const Color.fromARGB(255, 255, 255, 255)
+            ],
           ),
         ),
         child: Column(
@@ -134,21 +137,13 @@ class _SubmodulPageState extends State<QuestionListPage> {
                 return;
               }
 
-              // Submit jawaban ke server
               await provider.submits(token, widget.kaderId);
-
-              // Beri feedback ke pengguna
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Jawaban berhasil dikirim!")),
               );
 
-              // Navigasikan kembali ke halaman modul
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ModulPage(kaderId: widget.kaderId),
-                ),
-              );
+              context.goNamed('modul',
+                  pathParameters: {'kaderId': widget.kaderId.toString()});
             },
           ),
         );

@@ -88,6 +88,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
               obscureText: value,
               controller: widget.controller,
               inputFormatters: getInputFormatters(),
+              validator: widget.validator,
               decoration: InputDecoration(
                 fillColor: Colors.white,
                 filled: true,
@@ -99,6 +100,10 @@ class _CustomTextfieldState extends State<CustomTextfield> {
                 enabledBorder: OutlineInputBorder(
                   borderSide:
                       BorderSide(width: 1, color: AppColors.grey300.color),
+                  borderRadius: BorderRadius.circular(7.0),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 1, color: Colors.redAccent),
                   borderRadius: BorderRadius.circular(7.0),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -118,9 +123,9 @@ class _CustomTextfieldState extends State<CustomTextfield> {
                       )
                     : null,
               ),
-              onChanged: (value) {
-                validateInput(value);
-              },
+              // onChanged: (value) {
+              //   validateInput(value);
+              // },
             );
           },
         ),

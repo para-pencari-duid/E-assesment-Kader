@@ -1,4 +1,3 @@
-import 'package:e_assesment_kader_app/pages/sign_up_kader_page.dart';
 import 'package:e_assesment_kader_app/providers/kader_provider.dart';
 import 'package:e_assesment_kader_app/static/kader_result_state.dart';
 import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
@@ -91,11 +90,12 @@ class _ListKaderPageState extends State<ListKaderPage> {
                     backgroundColor: AppColors.green400.color,
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignUpKaderPage()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => const SignUpKaderPage()),
+                    // );
+                    context.go('/kader/register-kader');
                   },
                   child: const Icon(Icons.add, color: Colors.white),
                 ),

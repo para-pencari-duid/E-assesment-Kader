@@ -1,4 +1,3 @@
-import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
@@ -7,6 +6,8 @@ class CustomDropdown<T> extends StatelessWidget {
   final T? selectedValue;
   final String Function(T)? itemLabel;
   final ValueChanged<T?>? onChanged;
+  final FormFieldValidator<T>? validator; // ✅ Tambahkan validator
+
   const CustomDropdown({
     super.key,
     required this.title,
@@ -14,6 +15,7 @@ class CustomDropdown<T> extends StatelessWidget {
     this.selectedValue,
     this.itemLabel,
     this.onChanged,
+    this.validator, // ✅ Tambahkan validator
   });
 
   @override
@@ -27,31 +29,23 @@ class CustomDropdown<T> extends StatelessWidget {
                 .titleMedium!
                 .copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 15),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          margin: const EdgeInsets.only(bottom: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.grey300.color, width: 1.0),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<T>(
-              hint: Text(
-                "Select $title",
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              value: selectedValue,
-              items: items?.map((T item) {
-                return DropdownMenuItem<T>(
-                  value: item,
-                  child: Text(itemLabel!(item)), // Menggunakan fungsi itemLabel
-                );
-              }).toList(),
-              onChanged: onChanged,
+        DropdownButtonFormField<T>(
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
           ),
+          value: selectedValue,
+          items: items?.map((T item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Text(itemLabel!(item)),
+            );
+          }).toList(),
+          onChanged: onChanged,
+          validator: validator, // ✅ Gunakan validator
+          hint: Text("Select $title"),
         ),
       ],
     );

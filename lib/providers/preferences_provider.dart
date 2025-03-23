@@ -4,8 +4,11 @@ import 'package:flutter/foundation.dart';
 class PreferencesProvider extends ChangeNotifier {
   final PreferencesHelper _helper;
 
-  PreferencesProvider(this._helper) {
-    loadUsername(); // Panggil saat provider diinisialisasi
+  PreferencesProvider(this._helper);
+
+  Future<void> init() async {
+    await loadUserToken();
+    await loadUsername();
   }
 
   String? _userToken;
@@ -18,8 +21,10 @@ class PreferencesProvider extends ChangeNotifier {
   Future<void> saveUserToken(String token) async {
     try {
       await _helper.saveToken(token);
-      _userToken = token;
-      notifyListeners();
+      if (_userToken != token) {
+        _userToken = token;
+        notifyListeners();
+      }
     } catch (e) {
       notifyListeners();
     }
@@ -27,9 +32,11 @@ class PreferencesProvider extends ChangeNotifier {
 
   Future<void> loadUserToken() async {
     try {
-      _userToken = await _helper.getSavedToken();
-      print("TOKEN USER NOW: $_userToken");
-      notifyListeners();
+      final token = await _helper.getSavedToken();
+      if (_userToken != token) {
+        _userToken = token;
+        notifyListeners();
+      }
     } catch (e) {
       print("Exception: $e");
       notifyListeners();
@@ -62,7 +69,6 @@ class PreferencesProvider extends ChangeNotifier {
   Future<void> loadUsername() async {
     try {
       _username = await _helper.getSavedUsername();
-      print("USERNAME LOAD: $_username");
       notifyListeners();
     } catch (e) {
       print("Exception: $e");

@@ -1,4 +1,3 @@
-import 'package:e_assesment_kader_app/pages/list_kader_page.dart';
 import 'package:e_assesment_kader_app/providers/puskesmas_provider.dart';
 import 'package:e_assesment_kader_app/providers/user_provider.dart';
 import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
@@ -107,11 +106,10 @@ class _HomePageState extends State<HomePage> {
                     );
 
                     if (confirmLogout == true) {
-                      final prefProvider =
-                          context.read<PreferencesProvider>();
+                      final prefProvider = context.read<PreferencesProvider>();
                       final userProvider = context.read<UserProvider>();
 
-                      await userProvider.logoutUser (prefProvider.userToken!);
+                      await userProvider.logoutUser(prefProvider.userToken!);
                       await prefProvider.removeUsername();
                       await prefProvider.removeUserToken();
 

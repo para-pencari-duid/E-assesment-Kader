@@ -24,8 +24,7 @@ void main() async {
   final prefProvider = PreferencesProvider(PreferencesHelper(prefs));
 
   // Pastikan token dimuat sebelum runApp
-  await prefProvider.loadUserToken();
-  await prefProvider.loadUsername();
+  await prefProvider.init();
 
   debugPrint("Token setelah loadUserToken: ${prefProvider.userToken}");
 
@@ -75,12 +74,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<PreferencesProvider>(context, listen: true);
+
     return MaterialApp.router(
       title: 'E-Assesment Kader',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
-      routerConfig: routerConfig(context),
+      routerConfig: routerConfig(context, provider),
     );
   }
 }

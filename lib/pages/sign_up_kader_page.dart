@@ -1,6 +1,5 @@
 import 'package:e_assesment_kader_app/data/models/puskesmas_model.dart';
 import 'package:e_assesment_kader_app/data/models/user_model.dart';
-import 'package:e_assesment_kader_app/pages/list_kader_page.dart';
 import 'package:e_assesment_kader_app/providers/kader_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +20,7 @@ class SignUpKaderPage extends StatefulWidget {
 }
 
 class _SignUpKaderPageState extends State<SignUpKaderPage> {
+  final _formKey = GlobalKey<FormState>();
   PuskesmasModel? _selectedPuskesmas;
   String? _selectedGender;
   final TextEditingController _fullNameController = TextEditingController();
@@ -98,172 +98,213 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    CustomTextfield(
-                      title: "Nama Lengkap",
-                      textInputType: TextInputType.text,
-                      controller: _fullNameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Nama tidak boleh kosong";
-                        }
-                        if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                          return "Inputan hanya berisi huruf";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Consumer<PuskesmasProvider>(
-                      builder: (context, provider, child) {
-                        return switch (provider.resultState) {
-                          PuskesmasListLoadingState() =>
-                            Center(child: CircularProgressIndicator()),
-                          PuskesmasListLoadedState(data: var puskesmasList) =>
-                            CustomDropdown<PuskesmasModel>(
-                              title: "Puskesmas",
-                              items: puskesmasList,
-                              selectedValue: _selectedPuskesmas,
-                              itemLabel: (puskesmas) => puskesmas.nama!,
-                              onChanged: (selected) {
-                                setState(() {
-                                  _selectedPuskesmas = selected;
-                                });
-                              },
-                            ),
-                          PuskesmasListErrorState(error: var message) => Center(
-                              child: Text(message),
-                            ),
-                          _ => const SizedBox(),
-                        };
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    CustomDropdown<String>(
-                      title: "Jenis Kelamin",
-                      items: ["L", "P"], // List data gender
-                      selectedValue:
-                          _selectedGender, // Variabel state untuk menyimpan nilai yang dipilih
-                      itemLabel: (value) => value == "L"
-                          ? "Laki-laki"
-                          : "Perempuan", // Mapping label
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedGender =
-                              value; // Menyimpan nilai yang dipilih ke state
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "NIK",
-                      textInputType: TextInputType.number,
-                      controller: _nikController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "Umur",
-                      textInputType: TextInputType.number,
-                      controller: _umurController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "Posyandu",
-                      textInputType: TextInputType.name,
-                      controller: _posyanduController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "Pendidikan Terakhir",
-                      textInputType: TextInputType.name,
-                      controller: _pendikanTerakhirController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "Lama Menjadi Kader (dalam tahun)",
-                      textInputType: TextInputType.number,
-                      controller: _lamaJadiKaderController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextfield(
-                      title: "Pekerjaan Selain Kader",
-                      textInputType: TextInputType.name,
-                      controller: _pekerjaanNonKaderController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomDropdown<String>(
-                      title: "Apakah kader dapat insentif?",
-                      items: ["Ya", "Tidak"], // Pilihan dropdown
-                      selectedValue: _selectedInsentif,
-                      itemLabel: (value) =>
-                          value, // Langsung gunakan value sebagai label
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedInsentif = value;
-                        });
-                      },
-                    ),
-                    if (_selectedInsentif == "Ya") ...[
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomTextfield(
+                        title: "Nama Lengkap",
+                        textInputType: TextInputType.text,
+                        controller: _fullNameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Nama tidak boleh kosong";
+                          }
+                          if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                            return "Inputan hanya berisi huruf";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Consumer<PuskesmasProvider>(
+                        builder: (context, provider, child) {
+                          return switch (provider.resultState) {
+                            PuskesmasListLoadingState() =>
+                              Center(child: CircularProgressIndicator()),
+                            PuskesmasListLoadedState(data: var puskesmasList) =>
+                              CustomDropdown<PuskesmasModel>(
+                                title: "Puskesmas",
+                                items: puskesmasList,
+                                selectedValue: _selectedPuskesmas,
+                                itemLabel: (puskesmas) => puskesmas.nama!,
+                                onChanged: (selected) {
+                                  setState(() {
+                                    _selectedPuskesmas = selected;
+                                  });
+                                },
+                                validator: (value) => value == null
+                                    ? "Puskesmas tidak boleh kosong"
+                                    : null,
+                              ),
+                            PuskesmasListErrorState(error: var message) =>
+                              Center(
+                                child: Text(message),
+                              ),
+                            _ => const SizedBox(),
+                          };
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomDropdown<String>(
+                        title: "Jenis Kelamin",
+                        items: ["L", "P"],
+                        selectedValue: _selectedGender,
+                        itemLabel: (value) =>
+                            value == "L" ? "Laki-laki" : "Perempuan",
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedGender = value;
+                          });
+                        },
+                        validator: (value) => value == null
+                            ? "Jenis kelamin tidak boleh kosong"
+                            : null,
+                      ),
                       const SizedBox(height: 16),
                       CustomTextfield(
-                        title: "Nominal Insentif",
+                        title: "NIK",
                         textInputType: TextInputType.number,
-                        controller: _insentifController,
+                        controller: _nikController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "NIK tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextfield(
+                        title: "Umur",
+                        textInputType: TextInputType.number,
+                        controller: _umurController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Umur tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextfield(
+                        title: "Posyandu",
+                        textInputType: TextInputType.name,
+                        controller: _posyanduController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Posyandu tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextfield(
+                        title: "Pendidikan Terakhir",
+                        textInputType: TextInputType.name,
+                        controller: _pendikanTerakhirController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Pendidikan terakhir tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextfield(
+                        title: "Lama Menjadi Kader (dalam tahun)",
+                        textInputType: TextInputType.number,
+                        controller: _lamaJadiKaderController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Inputan tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextfield(
+                        title: "Pekerjaan Selain Kader",
+                        textInputType: TextInputType.name,
+                        controller: _pekerjaanNonKaderController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Inputan tidak boleh kosong";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomDropdown<String>(
+                        title: "Apakah kader dapat insentif?",
+                        items: ["Ya", "Tidak"], // Pilihan dropdown
+                        selectedValue: _selectedInsentif,
+                        itemLabel: (value) =>
+                            value, // Langsung gunakan value sebagai label
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedInsentif = value;
+                          });
+                        },
+                      ),
+                      if (_selectedInsentif == "Ya") ...[
+                        const SizedBox(height: 16),
+                        CustomTextfield(
+                          title: "Nominal Insentif",
+                          textInputType: TextInputType.number,
+                          controller: _insentifController,
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      Consumer<KaderProvider>(
+                        builder: (context, provider, child) {
+                          if (provider.isLoading == true) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          return CustomButton(
+                            title: "Daftar Kader",
+                            onTap: () async {
+                              final prefProvider =
+                                  context.read<PreferencesProvider>();
+
+                              if (_formKey.currentState!.validate()) {
+                                final request = UserModel(
+                                  puskesmasId:
+                                      _selectedPuskesmas?.id.toString(),
+                                  name: _fullNameController.text,
+                                  nik: _nikController.text,
+                                  kelamin: _selectedGender,
+                                  lamaJadiKader: _lamaJadiKaderController.text,
+                                  umur: _umurController.text.toString(),
+                                  posyandu: _posyanduController.text,
+                                  pekerjaanSelainKader:
+                                      _pekerjaanNonKaderController.text,
+                                  pendidikanTerakhir:
+                                      _pendikanTerakhirController.text,
+                                  dapatInsentifDariDesa: _selectedInsentif,
+                                  insentifPerTahun: _insentifController.text,
+                                );
+
+                                final result = await provider.createKader(
+                                    request, prefProvider.userToken!);
+
+                                if (result.kader != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(result.message!)),
+                                  );
+
+                                  context.go('/kader');
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(result.error!)),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        },
                       ),
                     ],
-                    const SizedBox(height: 24),
-                    Consumer<KaderProvider>(
-                      builder: (context, provider, child) {
-                        if (provider.isLoading == true) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        return CustomButton(
-                          title: "Daftar Kader",
-                          onTap: () async {
-                            final prefProvider =
-                                context.read<PreferencesProvider>();
-
-                            final request = UserModel(
-                              puskesmasId: _selectedPuskesmas?.id.toString(),
-                              name: _fullNameController.text,
-                              nik: _nikController.text,
-                              kelamin: _selectedGender,
-                              lamaJadiKader: _lamaJadiKaderController.text,
-                              umur: _umurController.text.toString(),
-                              posyandu: _posyanduController.text,
-                              pekerjaanSelainKader:
-                                  _pekerjaanNonKaderController.text,
-                              pendidikanTerakhir:
-                                  _pendikanTerakhirController.text,
-                              dapatInsentifDariDesa: _selectedInsentif,
-                              insentifPerTahun: _insentifController.text,
-                            );
-
-                            final result = await provider.createKader(
-                                request, prefProvider.userToken!);
-
-                            if (result.kader != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(result.message!)),
-                              );
-
-                              // context.goNamed("kader");
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ListKaderPage(),
-                                  ));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(result.error!)),
-                              );
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],

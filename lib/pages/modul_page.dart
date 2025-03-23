@@ -1,8 +1,8 @@
 import 'package:e_assesment_kader_app/data/models/modul_model.dart';
-import 'package:e_assesment_kader_app/pages/submodul_page.dart';
 import 'package:e_assesment_kader_app/providers/modul_provider.dart';
 import 'package:e_assesment_kader_app/static/modul_result_state.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/preferences_provider.dart';
@@ -54,7 +54,10 @@ class _ModulPageState extends State<ModulPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
+            colors: [
+              const Color.fromARGB(255, 255, 255, 255),
+              const Color.fromARGB(255, 255, 255, 255)
+            ],
           ),
         ),
         child: Column(
@@ -134,14 +137,12 @@ class ModulItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SubmodulPage(
-              kaderId: kaderId,
-              modulId: data.id!,
-            ),
-          ),
+        context.goNamed(
+          'submodul',
+          pathParameters: {
+            'kaderId': kaderId.toString(),
+            'modulId': data.id!.toString(),
+          },
         );
       },
       borderRadius: BorderRadius.circular(12),

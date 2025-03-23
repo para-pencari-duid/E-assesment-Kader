@@ -1,4 +1,3 @@
-import 'package:e_assesment_kader_app/pages/sign_up_page.dart';
 import 'package:e_assesment_kader_app/providers/preferences_provider.dart';
 import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
 import 'package:e_assesment_kader_app/widgets/custom_textfield.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../common/transitions.dart';
 import '../data/models/user_model.dart';
 import '../providers/user_provider.dart';
 import '../widgets/custom_button.dart';
@@ -20,6 +18,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   late AnimationController _controller;
@@ -154,65 +153,92 @@ class _LoginPageState extends State<LoginPage>
           borderRadius: BorderRadius.circular(18),
           boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 20),
-            CustomTextfield(
-              title: "Email",
-              textInputType: TextInputType.emailAddress,
-              controller: _emailController,
-            ),
-            const SizedBox(height: 20),
-            CustomTextfield(
-              title: "Password",
-              textInputType: TextInputType.visiblePassword,
-              obsecureText: true,
-              controller: _passwordController,
-            ),
-            const SizedBox(height: 25),
-            Consumer2<UserProvider, PreferencesProvider>(
-              builder: (context, userProvider, prefProvider, child) {
-                if (userProvider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return CustomButton(
-                  title: "Masuk",
-                  onTap: () async {
-                    final data = UserModel(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                    );
-                    final result = await userProvider.loginUser(data);
-                    if (result.users != null && result.users!.name != null) {
-                      await prefProvider.saveUserToken(result.token!);
-                      await prefProvider.saveUsername(result.users!.name!);
-                      context.go('/');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(userProvider.message!)));
-                    }
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Belum punya akun? ",
-                    style: Theme.of(context).textTheme.bodyMedium),
-                InkWell(
-                  onTap: () => context.goNamed('register'),
-                  child: Text("Daftar disini",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: AppColors.green700.color)),
+                const SizedBox(height: 20),
+                CustomTextfield(
+                  title: "Email",
+                  textInputType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Email tidak boleh kosong";
+                    }
+                    if (!RegExp(
+                            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                        .hasMatch(value)) {
+                      return "Format email tidak valid";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                CustomTextfield(
+                  title: "Password",
+                  textInputType: TextInputType.visiblePassword,
+                  obsecureText: true,
+                  controller: _passwordController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password tidak boleh kosong";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 25),
+                Consumer2<UserProvider, PreferencesProvider>(
+                  builder: (context, userProvider, prefProvider, child) {
+                    if (userProvider.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return CustomButton(
+                      title: "Masuk",
+                      onTap: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final data = UserModel(
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                          );
+
+                          final result = await userProvider.loginUser(data);
+                          if (result.users != null &&
+                              result.users!.name != null) {
+                            await prefProvider.saveUserToken(result.token!);
+                            await prefProvider
+                                .saveUsername(result.users!.name!);
+                            context.go('/');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(userProvider.message!)));
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Belum punya akun? ",
+                        style: Theme.of(context).textTheme.bodyMedium),
+                    InkWell(
+                      onTap: () => context.goNamed('register'),
+                      child: Text("Daftar disini",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: AppColors.green700.color)),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

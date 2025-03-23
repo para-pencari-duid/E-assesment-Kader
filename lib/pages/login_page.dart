@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage>
           child: _buildLoginForm(),
         ),
       ),
-    );
+    ); 
   }
 
   Widget _buildHeader() {

@@ -30,7 +30,8 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detail Kader", style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Detail Kader", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.teal,
         elevation: 0,
@@ -39,11 +40,13 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
       body: Consumer<ResultKaderProvider>(
         builder: (context, provider, child) {
           if (provider.resultState is ResultKaderLoadingState) {
-            return const Center(child: CircularProgressIndicator(color: Colors.teal));
+            return const Center(
+                child: CircularProgressIndicator(color: Colors.teal));
           } else if (provider.resultState is ResultKaderErrorState) {
             return Center(
               child: Text(provider.result!.message!,
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold)),
             );
           } else {
             return SingleChildScrollView(
@@ -59,21 +62,28 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
                           backgroundColor: Colors.teal,
                           child: ClipOval(
                             child: provider.result?.kelamin == "L"
-                                ? Image.asset("assets/img_male.png", fit: BoxFit.cover)
-                                : Image.asset("assets/img_woman.png", fit: BoxFit.cover),
+                                ? Image.asset("assets/img_male.png",
+                                    fit: BoxFit.cover)
+                                : Image.asset("assets/img_woman.png",
+                                    fit: BoxFit.cover),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(provider.result?.namaKader ?? "Tidak tersedia",
-                            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.teal.shade900,
                                 )),
                         const SizedBox(height: 8),
-                        Text("Puskesmas-${provider.result?.puskesmas?.nama ?? "-"}",
+                        Text(
+                            "Puskesmas-${provider.result?.puskesmas?.nama ?? "-"}",
                             style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 8),
-                        Text("Klasifikasi-${provider.result?.klasifikasi ?? "-"}",
+                        Text(
+                            "Klasifikasi-${provider.result?.klasifikasi ?? "-"}",
                             style: Theme.of(context).textTheme.titleMedium),
                       ],
                     ),
@@ -89,7 +99,8 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Nama: ${penilai.name}", style: _boldTextStyle()),
+                                  Text("Nama: ${penilai.name}",
+                                      style: _boldTextStyle()),
                                   Text("Tipe: ${penilai.tipe}"),
                                   Text("Puskesmas: ${penilai.puskesmas}"),
                                 ],
@@ -100,39 +111,86 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-_buildSectionTitle("Hasil Penilaian"),
-...?(provider.result?.hasilPenilaian?.map((kompetensi) {
-  return Column(
-    children: [
-      _buildCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Kompetensi: ${kompetensi.kompetensi}", style: _boldTextStyle()),
-            ...kompetensi.keterampilan!.map((keterampilan) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: Text("- ${keterampilan.namaKeterampilan}")),
-                    Chip(
-                      label: Text(keterampilan.status!),
-                      backgroundColor: keterampilan.status == "Lulus" ? Colors.green : Colors.red,
-                      labelStyle: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ],
-        ),
-      ),
-      const SizedBox(height: 16), // Tambahkan jarak antar card
-    ],
-  );
-}).toList() ?? []),
-
+                  _buildSectionTitle("Hasil Penilaian"),
+                  ...(provider.result?.hasilPenilaian?.map((kompetensi) {
+                        return Column(
+                          children: [
+                            _buildCard(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Kompetensi: ${kompetensi.kompetensi}",
+                                      style: _boldTextStyle()),
+                                  ...kompetensi.keterampilan!
+                                      .map((keterampilan) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                              child: Text(
+                                                  "- ${keterampilan.namaKeterampilan}")),
+                                          //todo: apabila tidak lulus, widget dapat ditekan dan muncul dialog penawaran utk melakukan remidi
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (keterampilan.status !=
+                                                  "Lulus") {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      AlertDialog(
+                                                    title: const Text(
+                                                        "Remidi Kompetensi"),
+                                                    content: Text(
+                                                        "Keterampilan '${keterampilan.namaKeterampilan}' belum lulus. Apakah ingin melakukan remidi?"),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                context), // Tutup dialog
+                                                        child:
+                                                            const Text("Tidak"),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context); // Tutup dialog
+                                                          // TODO: Tambahkan logika remidi di sini, misalnya navigasi ke halaman remidi
+                                                        },
+                                                        child: const Text(
+                                                            "Ya, Remidi"),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Chip(
+                                              label: Text(keterampilan.status!),
+                                              backgroundColor:
+                                                  keterampilan.status == "Lulus"
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                              labelStyle: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                                height: 16), // Tambahkan jarak antar card
+                          ],
+                        );
+                      }).toList() ??
+                      []),
                 ],
               ),
             );
@@ -145,7 +203,9 @@ _buildSectionTitle("Hasil Penilaian"),
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(title, style: _boldTextStyle().copyWith(fontSize: 18, color: Colors.teal.shade900)),
+      child: Text(title,
+          style: _boldTextStyle()
+              .copyWith(fontSize: 18, color: Colors.teal.shade900)),
     );
   }
 

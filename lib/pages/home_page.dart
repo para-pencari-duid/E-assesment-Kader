@@ -25,10 +25,8 @@ class _HomePageState extends State<HomePage> {
     final kaderProvider = context.read<KaderProvider>();
     final puskesmasProvider = context.read<PuskesmasProvider>();
 
-    print("TOKEN DIHOME PAGE: ${prefProvider.userToken}");
     Future.microtask(
       () {
-        // Pastikan token tidak null sebelum melakukan request
         if (prefProvider.userToken != null) {
           kaderProvider.fetchKaderList(prefProvider.userToken!);
           puskesmasProvider.fetchPuskesmasList();
@@ -131,7 +129,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 15),
             Align(
               alignment: Alignment.centerLeft,
-              child: GestureDetector(
+              child: InkWell(
                 onTap: () {
                   context.goNamed('kader');
                 },
@@ -140,9 +138,15 @@ class _HomePageState extends State<HomePage> {
                   height: 150,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.blue300.color,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                      color: AppColors.blue300.color,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.shade600,
+                            spreadRadius: 1,
+                            blurRadius: 10,
+                            offset: const Offset(1, 0))
+                      ]),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

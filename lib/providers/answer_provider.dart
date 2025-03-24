@@ -8,17 +8,19 @@ class AnswerProvider extends ChangeNotifier {
 
   AnswerProvider(this._modulService);
 
-  List<Penilaian> _answers = [];
+  final List<Penilaian> _answers = [];
   List<Penilaian> get answers => _answers;
 
-  // Tambah atau update jawaban
   void addOrUpdateAnswer(int pertanyaanId, int nilai) {
     final index = _answers.indexWhere((a) => a.pertanyaanId == pertanyaanId);
+
     if (index != -1) {
-      _answers[index].nilai = nilai; // Update jawaban yang sudah ada
+      _answers[index] = Penilaian(pertanyaanId: pertanyaanId, nilai: nilai);
     } else {
       _answers.add(Penilaian(pertanyaanId: pertanyaanId, nilai: nilai));
     }
+
+    // Perbarui list dengan List.from agar Flutter mendeteksi perubahan
     notifyListeners();
   }
 

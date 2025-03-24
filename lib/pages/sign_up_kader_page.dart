@@ -27,13 +27,12 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
   final TextEditingController _nikController = TextEditingController();
   final TextEditingController _umurController = TextEditingController();
   final TextEditingController _posyanduController = TextEditingController();
-  final TextEditingController _pendikanTerakhirController =
-      TextEditingController();
   final TextEditingController _lamaJadiKaderController =
       TextEditingController();
   final TextEditingController _pekerjaanNonKaderController =
       TextEditingController();
-  String? _selectedInsentif; // "Ya" atau "Tidak"
+  String? _selectedEducation;
+  String? _selectedInsentif;
   final TextEditingController _insentifController = TextEditingController();
 
   @override
@@ -53,7 +52,6 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
     _nikController.dispose();
     _umurController.dispose();
     _posyanduController.dispose();
-    _pendikanTerakhirController.dispose();
     _lamaJadiKaderController.dispose();
     _pekerjaanNonKaderController.dispose();
     _insentifController.dispose();
@@ -198,16 +196,27 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      CustomTextfield(
-                        title: "Pendidikan Terakhir",
-                        textInputType: TextInputType.name,
-                        controller: _pendikanTerakhirController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Pendidikan terakhir tidak boleh kosong";
-                          }
-                          return null;
+                      CustomDropdown<String>(
+                        title: "Tingkat Pendidikan",
+                        items: [
+                          "SD",
+                          "SMP",
+                          "SMA/SMK",
+                          "DIPLOMA",
+                          "SARJANA",
+                          "MAGISTER",
+                          "DOKTOR"
+                        ],
+                        selectedValue: _selectedEducation,
+                        itemLabel: (value) => value,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedEducation = value;
+                          });
                         },
+                        validator: (value) => value == null
+                            ? "Tingkat pendidikan tidak boleh kosong"
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       CustomTextfield(
@@ -278,11 +287,13 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                                   posyandu: _posyanduController.text,
                                   pekerjaanSelainKader:
                                       _pekerjaanNonKaderController.text,
-                                  pendidikanTerakhir:
-                                      _pendikanTerakhirController.text,
+                                  pendidikanTerakhir: _selectedEducation,
                                   dapatInsentifDariDesa: _selectedInsentif,
                                   insentifPerTahun: _insentifController.text,
                                 );
+
+                                print(
+                                    "REQUEST TO JSON: ${request.registerKaderToJson()}");
 
                                 final result = await provider.createKader(
                                     request, prefProvider.userToken!);
@@ -295,7 +306,12 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                                   context.go('/kader');
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(result.error!)),
+                                    SnackBar(
+                                      duration: Duration(seconds: 1),
+                                      content: Text(result.error ??
+                                          "Registrasi kader gagal"),
+                                      backgroundColor: Colors.red,
+                                    ),
                                   );
                                 }
                               }

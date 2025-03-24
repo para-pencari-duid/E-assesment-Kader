@@ -205,15 +205,29 @@ class _LoginPageState extends State<LoginPage>
                           );
 
                           final result = await userProvider.loginUser(data);
-                          if (result.users != null &&
-                              result.users!.name != null) {
+                          if (result.token != null && result.users != null) {
                             await prefProvider.saveUserToken(result.token!);
                             await prefProvider
                                 .saveUsername(result.users!.name!);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 1),
+                                content:
+                                    Text(result.message ?? "Login berhasil."),
+                                backgroundColor: AppColors.green500.color,
+                              ),
+                            );
                             context.go('/');
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(userProvider.message!)));
+                              SnackBar(
+                                duration: Duration(seconds: 1),
+                                content: Text(result.message ??
+                                    "Login gagal, coba lagi."),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
                           }
                         }
                       },

@@ -45,22 +45,33 @@ class KaderService {
 
   Future<RegisterKaderResponse> postRegisterKader(
       UserModel model, String token) async {
-    final response = await http.post(
-      Uri.parse("$_baseUrl/users/registerkader"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode(model.registerKaderToJson()),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse("$_baseUrl/users/registerkader"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(model.registerKaderToJson()),
+      );
 
-    print("REGISTER CODE: ${response.statusCode}");
-    print("REGISTER BODY: ${response.body}");
+      final responseData = jsonDecode(response.body);
 
-    if (response.statusCode == 201) {
-      return RegisterKaderResponse.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create data kader');
+      if (response.statusCode == 201) {
+        return RegisterKaderResponse.fromJson(responseData);
+      } else {
+        return RegisterKaderResponse(
+          error: responseData['error'],
+          message: responseData['message'],
+          kader: null,
+        );
+      }
+    } catch (e) {
+      return RegisterKaderResponse(
+        message: 'An error occurred: ${e.toString()}',
+        error: null,
+        kader: null,
+      );
     }
   }
 
@@ -78,6 +89,23 @@ class KaderService {
       return ResultKaderResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load puskesmas list');
+    }
+  }
+
+  Future<KaderListResponse> getKaderSearchList(
+      String token, String query) async {
+    final response = await http.get(
+      Uri.parse("$_baseUrl/users/kaders?search=$query"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return KaderListResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load search kader');
     }
   }
 }

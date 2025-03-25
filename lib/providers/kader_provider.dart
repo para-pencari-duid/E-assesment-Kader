@@ -100,12 +100,11 @@ class KaderProvider extends ChangeNotifier {
     try {
       final result = await _kaderService.postRegisterKader(request, token);
 
-      if (result.message != "Kader registered successfully") {
+      if (result.kader == null) {
         _isLoading = false;
-        _message = result.error;
+        _message = result.message ?? 'Register failed';
         notifyListeners();
         return result;
-        // return false;
       } else {
         _isLoading = false;
         _message = result.message;
@@ -113,15 +112,37 @@ class KaderProvider extends ChangeNotifier {
 
         await fetchKaderList(token);
         return result;
-        // return true;
       }
     } catch (e) {
-      _message = e.toString();
-      print("CREATE USER EXCEPTION: $_message");
       _isLoading = false;
+      _message = 'An unexpected error occurred';
       notifyListeners();
-      throw Exception(e.toString());
-      // return false;
+      return RegisterKaderResponse(
+          message: _message, error: e.toString(), kader: null);
+    }
+  }
+
+  Future<void> fetchKaderSearchList(String token, String query) async {
+    _resultState = KaderListLoadingState();
+    notifyListeners();
+
+    try {
+      final result = await _kaderService.getKaderSearchList(token, query);
+
+      if (result.data == null || result.data!.isEmpty) {
+        _message = "Data tidak ditemukan";
+        _resultState = KaderListErrorState(_message!);
+        notifyListeners();
+      } else {
+        _kaders = result.data;
+        _response = result;
+        _resultState = KaderListLoadedState(_kaders);
+        notifyListeners();
+      }
+    } on Exception catch (e) {
+      _message = "Data tidak ditemukan";
+      _resultState = KaderListErrorState(e.toString());
+      notifyListeners();
     }
   }
 }

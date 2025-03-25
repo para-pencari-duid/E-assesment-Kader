@@ -37,18 +37,32 @@ class AuthService {
   }
 
   Future<UserLoginResponse> postLoginUser(UserModel model) async {
-    final response = await http.post(
-      Uri.parse("$_baseUrl/users/login"),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(model.loginToJson()),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse("$_baseUrl/users/login"),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(model.loginToJson()),
+      );
 
-    if (response.statusCode == 200) {
-      return UserLoginResponse.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to login account');
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return UserLoginResponse.fromJson(responseData);
+      } else {
+        return UserLoginResponse(
+          message: responseData['message'] ?? 'Login failed',
+          users: null,
+          token: null,
+        );
+      }
+    } catch (e) {
+      return UserLoginResponse(
+        message: 'An error occurred: ${e.toString()}',
+        users: null,
+        token: null,
+      );
     }
   }
 

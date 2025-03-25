@@ -58,26 +58,23 @@ class UserProvider extends ChangeNotifier {
     try {
       final result = await _authService.postLoginUser(request);
 
-      if (result.message != "Login successful") {
+      if (result.token == null || result.users == null) {
         _isLoading = false;
-        _message = result.message!;
+        _message = result.message ?? 'Login failed';
         notifyListeners();
-        return result;
-        // return false;
-      } else {
-        _isLoading = false;
-        _message = result.message!;
-        _user = result.users;
-        notifyListeners();
-        return result;
-        // return true;
+        return result; // Pastikan tetap return result dengan pesan error
       }
-    } catch (e) {
-      _message = e.toString();
+
       _isLoading = false;
+      _message = result.message;
+      _user = result.users;
       notifyListeners();
-      throw Exception(e.toString());
-      // return false;
+      return result;
+    } catch (e) {
+      _isLoading = false;
+      _message = 'An unexpected error occurred';
+      notifyListeners();
+      return UserLoginResponse(message: _message, users: null, token: null);
     }
   }
 

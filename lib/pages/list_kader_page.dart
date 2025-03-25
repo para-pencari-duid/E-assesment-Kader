@@ -1,3 +1,4 @@
+import 'package:e_assesment_kader_app/pages/search_kader_page.dart';
 import 'package:e_assesment_kader_app/providers/kader_provider.dart';
 import 'package:e_assesment_kader_app/static/kader_result_state.dart';
 import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
@@ -16,6 +17,32 @@ class ListKaderPage extends StatefulWidget {
 }
 
 class _ListKaderPageState extends State<ListKaderPage> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  void _performSearch(String query) {
+    if (query.isNotEmpty) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchKaderPage(query: query),
+          ));
+    }
+
+    _fetchAllKader();
+  }
+
+  void _fetchAllKader() {
+    final prefProvider = context.read<PreferencesProvider>();
+    final kaderProvider = context.read<KaderProvider>();
+
+    if (prefProvider.userToken != null) {
+      kaderProvider.fetchKaderList(prefProvider.userToken!);
+    } else {
+      print("Token tidak ditemukan, tidak dapat mengambil data kader.");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +57,13 @@ class _ListKaderPageState extends State<ListKaderPage> {
         print("Token tidak ditemukan, tidak dapat mengambil data kader.");
       }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
+    _searchController.dispose();
   }
 
   @override
@@ -58,6 +92,8 @@ class _ListKaderPageState extends State<ListKaderPage> {
               children: [
                 Expanded(
                   child: TextField(
+                    focusNode: _focusNode,
+                    controller: _searchController,
                     decoration: InputDecoration(
                       hintText: "Cari Nama Kader",
                       prefixIcon:
@@ -78,7 +114,16 @@ class _ListKaderPageState extends State<ListKaderPage> {
                           )),
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          _performSearch(_searchController.text);
+                        },
+                      ),
                     ),
+                    onSubmitted: (value) {
+                      _performSearch(value);
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -90,11 +135,6 @@ class _ListKaderPageState extends State<ListKaderPage> {
                     backgroundColor: AppColors.green400.color,
                   ),
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => const SignUpKaderPage()),
-                    // );
                     context.go('/kader/register-kader');
                   },
                   child: const Icon(Icons.add, color: Colors.white),

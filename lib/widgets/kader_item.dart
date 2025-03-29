@@ -1,5 +1,4 @@
 import 'package:e_assesment_kader_app/data/models/user_model.dart';
-import 'package:e_assesment_kader_app/pages/detail_kader_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -60,11 +59,6 @@ class KaderItem extends StatelessWidget {
                       backgroundColor: AppColors.green500.color,
                     ),
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => ModulPage(kaderId: user.id!),
-                      //     ));
                       context.goNamed('modul',
                           pathParameters: {'kaderId': user.id!.toString()});
                     },
@@ -88,12 +82,8 @@ class KaderItem extends StatelessWidget {
                       backgroundColor: AppColors.grey300.color,
                     ),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DetailKaderPage(kaderId: user.id.toString()),
-                          ));
+                      context.goNamed('kader-detail',
+                          pathParameters: {'kaderId': user.id!.toString()});
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(5.0),

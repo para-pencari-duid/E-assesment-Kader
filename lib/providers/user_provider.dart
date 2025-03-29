@@ -25,25 +25,21 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print("REGISTER body: $request");
       final result = await _authService.postRegisterUser(request);
 
       if (result.message != "User registered successfully") {
         _isLoading = false;
         _message = result.message!;
-        print("REGISTER FAILED: $_message");
         notifyListeners();
         return false;
       } else {
         _isLoading = false;
         _message = result.message!;
-        print("REGISTER SUCCESS: $_message");
         notifyListeners();
         return true;
       }
     } catch (e) {
       _message = e.toString();
-      print("REGISTER EXCEPTION: $_message");
       _isLoading = false;
       notifyListeners();
       return false;
@@ -103,7 +99,6 @@ class UserProvider extends ChangeNotifier {
       _message = e.toString();
       _isLoading = false;
       notifyListeners();
-      print("EXCEPTION: ${e.toString()}");
       throw Exception(e.toString());
       // return false;
     }

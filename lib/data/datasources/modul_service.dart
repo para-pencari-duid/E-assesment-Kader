@@ -72,13 +72,42 @@ class ModulService {
       body: jsonEncode(data.toJson()),
     );
 
-    print("RESPONSE STATUS CODE: ${response.statusCode}");
-    print("RESPONSE QUESTIONS: ${response.body}");
-
     if (response.statusCode == 201) {
       return AnswersPostResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load model data');
+    }
+  }
+
+  Future<AnswersPostResponse> postRemidiAnswers(
+      String token, int kaderId, AnswersPostRequest data) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$_baseUrl/users/remidi-kader/$kaderId"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(data.toJson()),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        return AnswersPostResponse.fromJson(responseData);
+      } else {
+        return AnswersPostResponse(
+          message: responseData['message'],
+          kaderId: null,
+          penilai: null,
+        );
+      }
+    } catch (e) {
+      return AnswersPostResponse(
+        message: 'An error occurred: ${e.toString()}',
+        kaderId: null,
+        penilai: null,
+      );
     }
   }
 }

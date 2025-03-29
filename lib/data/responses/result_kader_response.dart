@@ -95,6 +95,8 @@ class HasilPenilaian {
 }
 
 class Keterampilan {
+  final int? idKeterampilan;
+  final int? kompetensiId;
   final String? namaKeterampilan;
   final int? totalNilai;
   final double? persentase;
@@ -103,6 +105,8 @@ class Keterampilan {
   final List<DetailPenilaian>? detailPenilaian;
 
   Keterampilan({
+    this.idKeterampilan,
+    this.kompetensiId,
     this.namaKeterampilan,
     this.totalNilai,
     this.persentase,
@@ -112,9 +116,11 @@ class Keterampilan {
   });
 
   factory Keterampilan.fromJson(Map<String, dynamic> json) => Keterampilan(
+        idKeterampilan: json["id_keterampilan"],
+        kompetensiId: json["kompetensi_id"],
         namaKeterampilan: json["nama_keterampilan"],
         totalNilai: json["total_nilai"],
-        persentase: (json["persentase"] as num?)?.toDouble(),
+        persentase: json["persentase"]?.toDouble(),
         status: json["status"],
         keterampilanSudahTerisi: json["keterampilan_sudah_terisi"] == null
             ? null
@@ -127,6 +133,8 @@ class Keterampilan {
       );
 
   Map<String, dynamic> toJson() => {
+        "id_keterampilan": idKeterampilan,
+        "kompetensi_id": kompetensiId,
         "nama_keterampilan": namaKeterampilan,
         "total_nilai": totalNilai,
         "persentase": persentase,

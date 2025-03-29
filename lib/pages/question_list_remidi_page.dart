@@ -9,19 +9,20 @@ import '../data/responses/answers_post_request.dart';
 import '../providers/answer_provider.dart';
 import '../providers/preferences_provider.dart';
 import '../static/pertanyaan_result_state.dart';
+import '../style/colors/app_colors.dart';
 
-class QuestionListPage extends StatefulWidget {
+class QuestionListRemidiPage extends StatefulWidget {
   final int kaderId;
   final int submodulId; //id keterampilan
 
-  const QuestionListPage(
+  const QuestionListRemidiPage(
       {required this.kaderId, required this.submodulId, super.key});
 
   @override
-  State<QuestionListPage> createState() => _SubmodulPageState();
+  State<QuestionListRemidiPage> createState() => _SubmodulPageState();
 }
 
-class _SubmodulPageState extends State<QuestionListPage> {
+class _SubmodulPageState extends State<QuestionListRemidiPage> {
   @override
   void initState() {
     super.initState();
@@ -124,10 +125,13 @@ class _SubmodulPageState extends State<QuestionListPage> {
   Widget _buildSubmitButton(BuildContext context) {
     return Consumer<AnswerProvider>(
       builder: (context, provider, child) {
+        if (provider.isLoading == true) {
+          return Center(child: CircularProgressIndicator());
+        }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: CustomButton(
-            title: "Submit",
+            title: "Submit Remidi",
             onTap: () async {
               final prefProvider = context.read<PreferencesProvider>();
               final token = prefProvider.userToken;
@@ -139,13 +143,27 @@ class _SubmodulPageState extends State<QuestionListPage> {
                 return;
               }
 
-              await provider.submits(token, widget.kaderId);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Jawaban berhasil dikirim!")),
-              );
+              final result = await provider.remidi(token, widget.kaderId);
 
-              context.goNamed('modul',
-                  pathParameters: {'kaderId': widget.kaderId.toString()});
+              if (result.penilai != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Jawaban remidi berhasil dikirim!"),
+                    backgroundColor: AppColors.green500.color,
+                  ),
+                );
+
+                context.goNamed('kader-detail',
+                    pathParameters: {'kaderId': widget.kaderId.toString()});
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text(result.message ?? "Registrasi kader gagal"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
           ),
         );

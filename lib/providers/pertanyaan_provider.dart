@@ -33,7 +33,6 @@ class QuestionProvider extends ChangeNotifier {
         notifyListeners();
       } else {
         _questiones = response.keterampilan?.pertanyaans;
-        print("Question NOW: $_questiones");
 
         _resultState = QuestionListLoadedState(_questiones);
         notifyListeners();

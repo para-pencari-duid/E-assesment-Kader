@@ -158,15 +158,9 @@ class SubmodulItem extends StatelessWidget {
         if (dataKeterampilan?.detailPenilaian != null &&
             dataKeterampilan!.detailPenilaian!.isNotEmpty) {
           penilai1Name = dataKeterampilan!.detailPenilaian!.first.penilai?.name;
-        } else {
-          print("DETAIL PENILAIAN KOSONG atau NULL");
         }
 
-        print("PENILAI 1 NAME: $penilai1Name");
-
         bool isAlreadyAssessed = penilai1Name == currentUsername;
-
-        print("IS ALREADY ASSERT: $isAlreadyAssessed");
 
         Color checklistColor = Colors.transparent;
         if (penilai1 && penilai2) {

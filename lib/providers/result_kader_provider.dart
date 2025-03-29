@@ -58,19 +58,16 @@ class ResultKaderProvider extends ChangeNotifier {
       final response = await _kaderService.getResultKader(token, kaderId);
       if (response.hasilPenilaian == null) {
         _message = "Data tidak ditemukan";
-        print("RESPONSE KADER FAILED: $response");
         _resultState = ResultKaderErrorState(response.message!);
         notifyListeners();
       } else {
         _result = response;
-        print("RESPONSE KADER SUCCESS: $_result");
         _resultState = ResultKaderLoadedState(response);
         notifyListeners();
       }
     } on Exception catch (e) {
       _message = "Data tidak ditemukan";
       _resultState = ResultKaderErrorState(e.toString());
-      print("RESPONSE KADER SUCCESS: ${e.toString()}");
       notifyListeners();
     }
   }

@@ -1,5 +1,6 @@
 import 'package:e_assesment_kader_app/static/result_kader_state.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/result_kader_provider.dart';
 import '../providers/preferences_provider.dart';
@@ -156,9 +157,35 @@ class _DetailKaderPageState extends State<DetailKaderPage> {
                                                       ),
                                                       ElevatedButton(
                                                         onPressed: () {
-                                                          Navigator.pop(
-                                                              context); // Tutup dialog
-                                                          // TODO: Tambahkan logika remidi di sini, misalnya navigasi ke halaman remidi
+                                                          int? parsedKaderId =
+                                                              int.tryParse(
+                                                                  widget
+                                                                      .kaderId);
+
+                                                          if (parsedKaderId ==
+                                                              null) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                  content: Text(
+                                                                      "Terjadi kesalahan: ID Kader tidak valid")),
+                                                            );
+                                                            return; // Hentikan eksekusi jika parsing gagal
+                                                          }
+                                                          context.goNamed(
+                                                            'remidi-kader',
+                                                            pathParameters: {
+                                                              'kaderId': widget
+                                                                  .kaderId,
+                                                              'submodulId':
+                                                                  keterampilan
+                                                                      .idKeterampilan!
+                                                                      .toString(),
+                                                            },
+                                                          );
+
+                                                          context.pop(context);
                                                         },
                                                         child: const Text(
                                                             "Ya, Remidi"),

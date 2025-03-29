@@ -20,7 +20,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  debugPrint("Token sebelum loadUserToken: ${prefs.getString('MY_TOKEN')}");
   final prefProvider = PreferencesProvider(PreferencesHelper(prefs));
 
   // Pastikan token dimuat sebelum runApp

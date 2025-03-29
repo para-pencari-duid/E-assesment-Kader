@@ -82,8 +82,7 @@ class PreferencesProvider extends ChangeNotifier {
       _username = null;
       notifyListeners();
     } catch (e) {
-      print("Failed to remove username: $e");
-      notifyListeners();
+      throw Exception(e.toString());
     }
   }
 }

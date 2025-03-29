@@ -1,6 +1,7 @@
 import 'package:e_assesment_kader_app/data/models/puskesmas_model.dart';
 import 'package:e_assesment_kader_app/data/models/user_model.dart';
 import 'package:e_assesment_kader_app/providers/kader_provider.dart';
+import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -292,15 +293,15 @@ class _SignUpKaderPageState extends State<SignUpKaderPage> {
                                   insentifPerTahun: _insentifController.text,
                                 );
 
-                                print(
-                                    "REQUEST TO JSON: ${request.registerKaderToJson()}");
-
                                 final result = await provider.createKader(
                                     request, prefProvider.userToken!);
 
                                 if (result.kader != null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(result.message!)),
+                                    SnackBar(
+                                      content: Text(result.message!),
+                                      backgroundColor: AppColors.green500.color,
+                                    ),
                                   );
 
                                   context.go('/kader');

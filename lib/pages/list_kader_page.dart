@@ -1,4 +1,3 @@
-import 'package:e_assesment_kader_app/pages/search_kader_page.dart';
 import 'package:e_assesment_kader_app/providers/kader_provider.dart';
 import 'package:e_assesment_kader_app/static/kader_result_state.dart';
 import 'package:e_assesment_kader_app/style/colors/app_colors.dart';
@@ -17,20 +16,8 @@ class ListKaderPage extends StatefulWidget {
 }
 
 class _ListKaderPageState extends State<ListKaderPage> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
-  void _performSearch(String query) {
-    if (query.isNotEmpty) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchKaderPage(query: query),
-          ));
-    }
-
-    _fetchAllKader();
-  }
+  late TextEditingController _searchController = TextEditingController();
+  late FocusNode _focusNode = FocusNode();
 
   void _fetchAllKader() {
     final prefProvider = context.read<PreferencesProvider>();
@@ -43,12 +30,30 @@ class _ListKaderPageState extends State<ListKaderPage> {
     }
   }
 
+  void _performSearch(String query) {
+    if (query.isNotEmpty) {
+      context.goNamed('search-kader', pathParameters: {'query': query});
+    }
+
+    _fetchAllKader();
+  }
+
   @override
   void initState() {
     super.initState();
 
     final prefProvider = context.read<PreferencesProvider>();
     final kaderProvider = context.read<KaderProvider>();
+
+    _searchController = TextEditingController();
+    _focusNode = FocusNode();
+
+    // Tambahkan listener ke TextField
+    _searchController.addListener(() {
+      if (_searchController.text.isEmpty) {
+        _fetchAllKader(); // Jika search field kosong, refresh data
+      }
+    });
 
     Future.microtask(() {
       if (prefProvider.userToken != null) {
@@ -96,8 +101,6 @@ class _ListKaderPageState extends State<ListKaderPage> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: "Cari Nama Kader",
-                      prefixIcon:
-                          Icon(Icons.search, color: AppColors.green400.color),
                       filled: true,
                       fillColor: Colors.white,
                       enabledBorder: OutlineInputBorder(
